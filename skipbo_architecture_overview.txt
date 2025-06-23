@@ -1,0 +1,110 @@
+
+Skip-Bo Game Architecture Overview (Vanilla JS Project)
+=======================================================
+
+🧱 GENERAL PROJECT STRUCTURE: LAYERS OF RESPONSIBILITY
+
+This project should be structured into clear layers, each handling a different concern. This helps keep the code maintainable and scalable.
+
+-------------------------------------------------------
+1. 🧠 Game State Layer
+-------------------------------------------------------
+This holds all the data that describes the current game:
+- What cards are in which piles?
+- What’s in each player’s hand?
+- Whose turn is it?
+- Has someone won?
+
+Example Structure:
+const gameState = {
+  drawPile: [...],             // shuffled deck
+  buildPiles: [[], [], [], []],// shared central piles (up to 4)
+  players: [
+    {
+      hand: [],
+      stockPile: [],
+      discardPiles: [[], [], [], []]
+    }
+  ],
+  currentPlayerIndex: 0
+};
+
+This is the single source of truth for game logic and rendering.
+
+-------------------------------------------------------
+2. 🧮 Game Logic Layer
+-------------------------------------------------------
+Handles rules and interactions:
+- Shuffling and dealing
+- Validating card placements
+- Turn progression
+- Drawing cards
+- Winning conditions
+
+Functions might include:
+- shuffleDeck(deck)
+- drawCard(player)
+- playCard(source, destination)
+- isValidMove(card, pile)
+- checkWinCondition()
+
+Keep these functions pure when possible.
+
+-------------------------------------------------------
+3. 🧱 DOM Rendering Layer
+-------------------------------------------------------
+Responsible for displaying the game state in the DOM.
+
+Example responsibilities:
+- Creating/removing card elements
+- Updating classes or styles
+- Responding to clicks
+
+Typical functions:
+- renderGameState(gameState)
+- renderPlayerHand(player)
+- renderBuildPiles(buildPiles)
+
+This layer reads from gameState and updates the DOM.
+
+-------------------------------------------------------
+4. 🎮 Event Handling Layer
+-------------------------------------------------------
+This connects user input (clicks, drags, etc.) to the game logic.
+
+Responsibilities:
+- Detect clicks on cards
+- Handle drag/drop or click-to-play
+- Pass info to playCard()
+- Trigger re-renders
+
+Example:
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', handleCardClick);
+});
+
+-------------------------------------------------------
+🔄 Interaction Between Layers
+
+[User Clicks Card]
+       ↓
+[Event Handling Layer] → calls →
+[Game Logic Layer] → updates →
+[Game State Layer]
+       ↓
+[Rendering Layer] → updates →
+[DOM]
+
+Each layer does one job and passes data to the next.
+
+-------------------------------------------------------
+🚧 Suggested Step-by-Step Development Order
+
+1. Build `gameState` structure
+2. Add game setup logic (shuffle, deal cards)
+3. Render the initial game state
+4. Add basic interactivity (e.g., playing cards to piles)
+5. Add rules, turn-taking, and win conditions
+
+This order minimizes bugs and keeps development manageable.
+

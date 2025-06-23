@@ -2,22 +2,22 @@ console.log('dozens of hours of fun');
 
 // library of the cards we want to generate
 const cardObjectDefinitions = [
-	{ id: 1, imagePath: '/styles/images/card-1.png' },
-	{ id: 2, imagePath: '/styles/images/card-2.png' },
-	{ id: 3, imagePath: '/styles/images/card-3.png' },
-	{ id: 4, imagePath: '/styles/images/card-4.png' },
-	{ id: 5, imagePath: '/styles/images/card-5.png' },
-	{ id: 6, imagePath: '/styles/images/card-6.png' },
-	{ id: 7, imagePath: '/styles/images/card-7.png' },
-	{ id: 8, imagePath: '/styles/images/card-8.png' },
-	{ id: 9, imagePath: '/styles/images/card-9.png' },
-	{ id: 10, imagePath: '/styles/images/card-10.png' },
-	{ id: 11, imagePath: '/styles/images/card-11.png' },
-	{ id: 12, imagePath: '/styles/images/card-12.png' },
-	{ id: 13, imagePath: '/styles/images/card-w.png' },
+	{ id: 1, imagePath: './styles/img/card-1.png' },
+	{ id: 2, imagePath: './styles/img/card-2.png' },
+	{ id: 3, imagePath: './styles/img/card-3.png' },
+	{ id: 4, imagePath: './styles/img/card-4.png' },
+	{ id: 5, imagePath: './styles/img/card-5.png' },
+	{ id: 6, imagePath: './styles/img/card-6.png' },
+	{ id: 7, imagePath: './styles/img/card-7.png' },
+	{ id: 8, imagePath: './styles/img/card-8.png' },
+	{ id: 9, imagePath: './styles/img/card-9.png' },
+	{ id: 10, imagePath: './styles/img/card-10.png' },
+	{ id: 11, imagePath: './styles/img/card-11.png' },
+	{ id: 12, imagePath: './styles/img/card-12.png' },
+	{ id: 13, imagePath: './styles/img/card-w.png' },
 ];
 
-const cardbackImgPath = '/styles/imgs/card-back.png';
+const cardBackImgPath = './styles/img/card-back.png';
 const cardContainerElem = document.querySelector('.card-container');
 
 {
@@ -53,7 +53,7 @@ function createCard(cardItem) {
 
 	//add src attribute and appropriate value to the img element
 	addSrcToImageElem(cardFrontImg, cardItem.imagePath);
-	addSrcToImageElem(cardBackImg, cardbackImgPath);
+	addSrcToImageElem(cardBackImg, cardBackImgPath);
 
 	//assign class to imgs of the card
 	addClassToElement(cardFrontImg, 'card-img');
@@ -63,8 +63,11 @@ function createCard(cardItem) {
 	addChildElement(cardFrontElem, cardFrontImg);
 	addChildElement(cardBackElem, cardBackImg);
 	addChildElement(cardInnerElem, cardFrontElem);
-	addChildElement(cardInnerElem, cardbackElem);
+	addChildElement(cardInnerElem, cardBackElem);
 	addChildElement(cardElem, cardInnerElem);
+
+	//add the cards to the container
+	addChildElement(cardContainerElem, cardElem);
 }
 
 // will create an html element of elemType
@@ -84,10 +87,12 @@ function addIdToElement(elem, id) {
 
 // will add appropriate path for img elements
 function addSrcToImageElem(imgElem, src) {
-	imgElemElem.src = src;
+	imgElem.src = src;
 }
 
 // creates a parent-child relationship between elems on the DOM
 function addChildElement(parentElem, childElem) {
 	parentElem.appendChild(childElem);
 }
+
+cardObjectDefinitions.forEach(createCard);
