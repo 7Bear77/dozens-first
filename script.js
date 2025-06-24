@@ -21,6 +21,7 @@ const stockPileSize = 30;
 const numOfPlayers = 2;
 const numOfSets = 12;
 let globalCardIdCounter = 1;
+const maxHandSize = 5;
 
 const cardBackImgPath = './styles/img/card-back.png';
 const cardContainerElem = document.querySelector('.card-container');
@@ -134,6 +135,20 @@ function addCardsToStockPile() {
 	}
 }
 
+function drawCards(player) {
+	let cardsToDraw = maxHandSize - gameState.players[player].hand.length;
+	if (cardsToDraw > 0) {
+		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
+		cardsDrawn.forEach((card) => {
+			gameState.players[player].hand.push(card);
+		});
+	}
+	gameState.currentPlayerIndex =
+		(gameState.currentPlayerIndex + 1) % numOfPlayers;
+}
+
 shuffle(gameState.drawPile);
 addCardsToStockPile();
+drawCards(gameState.currentPlayerIndex);
+drawCards(gameState.currentPlayerIndex);
 console.log(gameState);
