@@ -17,18 +17,20 @@ const cardObjectDefinitions = [
 	{ id: 13, imagePath: './styles/img/card-w.png' },
 ];
 
+const stockPileSize = 30;
+const numOfPlayers = 2;
+const numOfSets = 12;
+
 const cardBackImgPath = './styles/img/card-back.png';
 const cardContainerElem = document.querySelector('.card-container');
 
-{
-	/* <div class="card">
-<div class="card-inner">
-    <div class="card-front">
-        <img/>
-    </div>
-    <div class="card-back">
-        <img/> */
-}
+const gameState = {
+	drawPile: Array.from({ length: numOfSets }).flatMap(() =>
+		cardObjectDefinitions.map((card) => ({ ...card }))
+	),
+	buildPiles: [[], [], [], []],
+	players: [],
+};
 
 // dynamically creates our card
 function createCard(cardItem) {
@@ -95,4 +97,39 @@ function addChildElement(parentElem, childElem) {
 	parentElem.appendChild(childElem);
 }
 
-cardObjectDefinitions.forEach(createCard);
+function shuffle(array) {
+	let currentIndex = array.length;
+	while (currentIndex != 0) {
+		let randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex--;
+		[array[currentIndex], array[randomIndex]] = [
+			array[randomIndex],
+			array[currentIndex],
+		];
+	}
+}
+
+function addPlayers() {
+	for (let i = 0; i < numOfPlayers; i++) {
+		gameState.players.push({
+			hand: [],
+			stockPile: [],
+			discardPiles: [[], [], [], []],
+			currentPlayerIndex: 0,
+		});
+	}
+}
+
+function addCardsToStockPile() {
+	addPlayers();
+	for (let i = 0; i < numOfPlayers; i++) {
+		gameState.players[i].stockPile = gameState.drawPile.splice(
+			0,
+			stockPileSize
+		);
+	}
+}
+
+shuffle(gameState.drawPile);
+addCardsToStockPile();
+console.log(gameState);
