@@ -20,16 +20,21 @@ const cardObjectDefinitions = [
 const stockPileSize = 30;
 const numOfPlayers = 2;
 const numOfSets = 12;
+let globalCardIdCounter = 1;
 
 const cardBackImgPath = './styles/img/card-back.png';
 const cardContainerElem = document.querySelector('.card-container');
 
 const gameState = {
 	drawPile: Array.from({ length: numOfSets }).flatMap(() =>
-		cardObjectDefinitions.map((card) => ({ ...card }))
+		cardObjectDefinitions.map((card) => ({
+			...card,
+			instanceId: globalCardIdCounter++,
+		}))
 	),
 	buildPiles: [[], [], [], []],
 	players: [],
+	currentPlayerIndex: 0,
 };
 
 // dynamically creates our card
@@ -115,7 +120,6 @@ function addPlayers() {
 			hand: [],
 			stockPile: [],
 			discardPiles: [[], [], [], []],
-			currentPlayerIndex: 0,
 		});
 	}
 }
