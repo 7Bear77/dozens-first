@@ -139,12 +139,18 @@ function drawCards(player) {
 	let cardsToDraw = maxHandSize - gameState.players[player].hand.length;
 	if (cardsToDraw > 0) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
-		cardsDrawn.forEach((card) => {
-			gameState.players[player].hand.push(card);
-		});
+		gameState.players[player].hand.push(...cardsDrawn);
 	}
 	gameState.currentPlayerIndex =
 		(gameState.currentPlayerIndex + 1) % numOfPlayers;
+}
+
+function isValidMove(card, buildPile) {
+	const topCard = buildPile[buildPile.length - 1];
+	const topCardValue = topCard?.id ?? 0;
+	const cardValue = card.id;
+	const nextRequiredCard = topCardValue + 1;
+	return card.id === nextRequiredCard || card.id === 13;
 }
 
 shuffle(gameState.drawPile);
