@@ -153,6 +153,54 @@ function isValidMove(card, buildPile) {
 	return card.id === nextRequiredCard || card.id === 13;
 }
 
+function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
+	const player = gameState.players[playerIndex];
+	let source;
+
+	switch (sourceType) {
+		case 'stock':
+			source = player.stockPile;
+			break;
+		case 'hand':
+			source = player.hand;
+			break;
+		case 'discard':
+			source = player.discardPiles;
+			break;
+		default:
+			console.log('Invalid sourcetype');
+			return;
+	}
+
+	let card;
+	const discardPile = player.discardPiles[cardSourceIndex];
+
+	if (sourceType === 'hand') {
+		card = player.hand[cardSourceIndex];
+	} else if (sourceType === 'stock') {
+		card = player.stockPile[player.stockPile.length - 1];
+	} else if (sourceType === 'discard') {
+		card = discardPile[discardPile.length - 1];
+	}
+
+	if (isValidMove(card, gameState.buildPiles[targetPileIndex])) {
+		gameState.buildPiles[targetPileIndex].push(card);
+		if (sourceType === 'hand') {
+			player.hand.splice(cardSourceIndex, 1);
+			console.log('sucsess');
+		} else if (sourceType === 'discard') {
+			discardPile.pop();
+			console.log('sucsess');
+		} else if (sourceType === 'stock') {
+			player.stockPile.pop();
+			console.log('sucsess');
+		}
+	} else {
+		console.log('Invalid Move');
+		return;
+	}
+}
+
 shuffle(gameState.drawPile);
 addCardsToStockPile();
 drawCards(gameState.currentPlayerIndex);
