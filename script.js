@@ -127,7 +127,6 @@ function addPlayers() {
 }
 
 function addCardsToStockPile() {
-	addPlayers();
 	for (let i = 0; i < numOfPlayers; i++) {
 		gameState.players[i].stockPile = gameState.drawPile.splice(
 			0,
@@ -142,7 +141,6 @@ function drawCards(player) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
 		gameState.players[player].hand.push(...cardsDrawn);
 	}
-	endTheTurn();
 }
 
 function endTheTurn() {
@@ -206,12 +204,10 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 
 function discardCard(playerIndex, cardSourceIndex, targetPileIndex) {
 	const player = gameState.players[playerIndex];
-	card = player.hand[cardSourceIndex];
-	console.log(gameState.players.discardPiles);
+	const card = player.hand[cardSourceIndex];
 	player.discardPiles[targetPileIndex].push(card);
 	player.hand.splice(cardSourceIndex, 1);
 	endTheTurn();
-	console.log(gameState);
 }
 
 function clearFullPlayPile(targetPileIndex) {
@@ -232,8 +228,12 @@ function isFullPile(targetPileIndex) {
 	}
 }
 
-shuffle(gameState.drawPile);
-addCardsToStockPile();
-drawCards(gameState.currentPlayerIndex);
-drawCards(gameState.currentPlayerIndex);
-console.log(gameState);
+function startGame() {
+	addPlayers();
+	shuffle(gameState.drawPile);
+	addCardsToStockPile();
+	drawCards(gameState.currentPlayerIndex);
+	console.log(gameState);
+}
+
+startGame();
