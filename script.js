@@ -142,6 +142,10 @@ function drawCards(player) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
 		gameState.players[player].hand.push(...cardsDrawn);
 	}
+	endTheTurn();
+}
+
+function endTheTurn() {
 	gameState.currentPlayerIndex =
 		(gameState.currentPlayerIndex + 1) % numOfPlayers;
 }
@@ -198,6 +202,16 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 		console.log('Invalid Move');
 		return;
 	}
+}
+
+function discardCard(playerIndex, cardSourceIndex, targetPileIndex) {
+	const player = gameState.players[playerIndex];
+	card = player.hand[cardSourceIndex];
+	console.log(gameState.players.discardPiles);
+	player.discardPiles[targetPileIndex].push(card);
+	player.hand.splice(cardSourceIndex, 1);
+	endTheTurn();
+	console.log(gameState);
 }
 
 function clearFullPlayPile(targetPileIndex) {
