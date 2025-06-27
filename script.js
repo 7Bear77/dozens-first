@@ -35,6 +35,7 @@ const gameState = {
 	),
 	buildPiles: [[], [], [], []],
 	players: [],
+	cardsToBeShuffled: [],
 	currentPlayerIndex: 0,
 };
 
@@ -185,18 +186,34 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 
 	if (isValidMove(card, gameState.buildPiles[targetPileIndex])) {
 		gameState.buildPiles[targetPileIndex].push(card);
+		isFullPile(targetPileIndex);
 		if (sourceType === 'hand') {
 			player.hand.splice(cardSourceIndex, 1);
-			console.log('sucsess');
 		} else if (sourceType === 'discard') {
 			discardPile.pop();
-			console.log('sucsess');
 		} else if (sourceType === 'stock') {
 			player.stockPile.pop();
-			console.log('sucsess');
 		}
 	} else {
 		console.log('Invalid Move');
+		return;
+	}
+}
+
+function clearFullPlayPile(targetPileIndex) {
+	gameState.cardsToBeShuffled.push(...gameState.piles[targetPileIndex]);
+}
+
+function reStock() {
+	shuffle(gameState.cardsToBeShuffled);
+	gameState.drawPile.push(...gameState.cardsToBeShuffled);
+}
+
+function isFullPile(targetPileIndex) {
+	const pile = gameState.buildPiles[targetPileIndex];
+	if (pile.length === 12) {
+		clearFullPlayPile();
+	} else {
 		return;
 	}
 }
