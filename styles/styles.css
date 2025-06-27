@@ -3,6 +3,12 @@
 	--card-height: 220px;
 }
 
+main {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .card-container {
 	margin-top: 30px;
 	position: relative;
@@ -43,4 +49,88 @@
 
 .card:hover .card-inner {
 	transform: rotateY(180deg);
+}
+
+.game-board,
+.draw-pile,
+.play-pile-zone,
+.play-pile,
+.stock-pile,
+.hand-zone,
+.discard-pile-zone,
+.discard-pile {
+	/* border: 1px solid black; */
+	gap: 1rem;
+}
+
+.game-board {
+	width: 90vw;
+	height: 90vh;
+	display: grid;
+	grid-template-areas:
+		'player1 player1 player1'
+		'completed play draw'
+		'player0 player0 player0';
+	border: 1px solid black;
+	grid-template-rows: 1fr 1fr 1fr;
+	grid-template-columns: 15% 1fr 15%;
+}
+
+.player-zone.p0,
+.player-zone.p1 {
+	grid-area: player0;
+	border: 1px solid blue;
+	display: flex;
+}
+
+.to-be-shuffled {
+	grid-area: completed;
+	border: 1px solid red;
+}
+
+.play-piles-zone {
+	grid-area: play;
+	border: 1px solid cyan;
+	display: flex;
+	justify-content: space-around;
+}
+
+.draw-pile {
+	grid-area: draw;
+	border: 1px solid orange;
+}
+.player-zone.p1 {
+	grid-area: player1;
+	border: 1px solid blue;
+}
+
+.play-pile {
+	border: 1px solid green;
+	width: 20%;
+}
+
+.p0 > .hand-zone,
+.p1 > .hand-zone {
+	border: 1px solid chocolate;
+	width: 40%;
+}
+
+.p0 > .discard-pile-zone,
+.p1 > .discard-pile-zone {
+	border: 1px solid grey;
+	width: 40%;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.p0 > .discard-pile-zone > .discard-pile,
+.p1 > .discard-pile-zone > .discard-pile {
+	border: 1px solid black;
+}
+
+.p0 > .stock-pile,
+.p1 > .stock-pile {
+	border: 1px solid tomato;
+	width: 15%;
+	margin-left: auto;
 }
