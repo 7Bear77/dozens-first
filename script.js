@@ -106,7 +106,7 @@ function addChildElement(parentElem, childElem) {
 
 function shuffle(array) {
 	let currentIndex = array.length;
-	while (currentIndex != 0) {
+	while (currentIndex !== 0) {
 		let randomIndex = Math.floor(Math.random() * currentIndex);
 		currentIndex--;
 		[array[currentIndex], array[randomIndex]] = [
@@ -211,7 +211,8 @@ function discardCard(playerIndex, cardSourceIndex, targetPileIndex) {
 }
 
 function clearFullPlayPile(targetPileIndex) {
-	gameState.cardsToBeShuffled.push(...gameState.piles[targetPileIndex]);
+	gameState.cardsToBeShuffled.push(...gameState.buildPiles[targetPileIndex]);
+	gameState.buildPiles[targetPileIndex] = [];
 }
 
 function reStock() {
