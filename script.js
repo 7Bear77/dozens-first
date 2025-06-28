@@ -237,4 +237,14 @@ function startGame() {
 	console.log(gameState);
 }
 
+function createCards() {
+	for (i = 0; i < numOfSets; i++) {
+		{
+			cardObjectDefinitions.forEach((cardItem) => {
+				createCard(cardItem);
+			});
+		}
+	}
+}
+
 startGame();
