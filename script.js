@@ -17,22 +17,45 @@ const cardObjectDefinitions = [
 	{ id: 13, imagePath: './styles/img/card-w.png' },
 ];
 
+const cardBackImgPath = './styles/img/card-back.png';
+
 const stockPileSize = 30;
 const numOfPlayers = 2;
 const numOfSets = 12;
-let globalCardIdCounter = 1;
 const maxHandSize = 5;
+let globalCardIdCounter = 1;
 
-const cardBackImgPath = './styles/img/card-back.png';
 const cardContainerElem = document.querySelector('.card-container');
+const toBeShuffledDiv = document.querySelector('.to-be-shuffled');
+const drawPileDiv = document.querySelector('.draw-pile');
+const playPile0Div = document.querySelector('.play-pile.p0');
+const playPile1Div = document.querySelector('.play-pile.p1');
+const playPile2Div = document.querySelector('.play-pile.p2');
+const playPile3Div = document.querySelector('.play-pile.p3');
+const player0HandDiv = document.querySelector('.p0 .hand-zone');
+const player0Discard0Div = document.querySelector('.p0 .discard-pile-zone .d0');
+const player0Discard1Div = document.querySelector('.p0 .discard-pile-zone .d1');
+const player0Discard2Div = document.querySelector('.p0 .discard-pile-zone .d2');
+const player0Discard3Div = document.querySelector('.p0 .discard-pile-zone .d3');
+const player0StockPileDiv = document.querySelector('.p0 .stock-pile');
+const player1HandDiv = document.querySelector('.p1 .hand-zone');
+const player1Discard0Div = document.querySelector('.p1 .discard-pile-zone .d0');
+const player1Discard1Div = document.querySelector('.p1 .discard-pile-zone .d1');
+const player1Discard2Div = document.querySelector('.p1 .discard-pile-zone .d2');
+const player1Discard3Div = document.querySelector('.p1 .discard-pile-zone .d3');
+const player1StockPileDiv = document.querySelector('.p1 .stock-pile');
 
-const gameState = {
-	drawPile: Array.from({ length: numOfSets }).flatMap(() =>
+function addCardsToArray(location) {
+	const cards = Array.from({ length: numOfSets }).flatMap(() =>
 		cardObjectDefinitions.map((card) => ({
 			...card,
-			instanceId: globalCardIdCounter++,
 		}))
-	),
+	);
+	location.push(...cards);
+}
+
+const gameState = {
+	drawPile: [],
 	buildPiles: [[], [], [], []],
 	players: [],
 	cardsToBeShuffled: [],
@@ -76,7 +99,7 @@ function createCard(cardItem) {
 	addChildElement(cardElem, cardInnerElem);
 
 	//add the cards to the container
-	addChildElement(cardContainerElem, cardElem);
+	addChildElement(drawPileDiv, cardElem);
 }
 
 // will create an html element of elemType
@@ -87,6 +110,11 @@ function createElement(elemType) {
 // will add a class to an html element
 function addClassToElement(elem, className) {
 	elem.classList.add(className);
+}
+
+// will remove a class from an html element
+function removeClassFromElement(elem, className) {
+	elem.classList.remove(className);
 }
 
 // will add a unique id to the element
@@ -101,7 +129,11 @@ function addSrcToImageElem(imgElem, src) {
 
 // creates a parent-child relationship between elems on the DOM
 function addChildElement(parentElem, childElem) {
-	parentElem.appendChild(childElem);
+	if (parentElem) {
+		parentElem.appendChild(childElem);
+	} else {
+		console.log('attempted to append a child to a null parent');
+	}
 }
 
 function shuffle(array) {
@@ -139,7 +171,7 @@ function drawCards(player) {
 	let cardsToDraw = maxHandSize - gameState.players[player].hand.length;
 	let drawPile = gameState.drawPile;
 
-	if (drawPile.length < 5) {
+	if (drawPile.length < maxHandSize) {
 		reStock();
 	} else {
 		return;
@@ -265,4 +297,5 @@ function determineWinner(playerIndex) {
 	}
 }
 
-startGame();
+// startGame();
+// createCards();
