@@ -137,6 +137,14 @@ function addCardsToStockPile() {
 
 function drawCards(player) {
 	let cardsToDraw = maxHandSize - gameState.players[player].hand.length;
+	let drawPile = gameState.drawPile;
+
+	if (drawPile.length < 5) {
+		reStock();
+	} else {
+		return;
+	}
+
 	if (cardsToDraw > 0) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
 		gameState.players[player].hand.push(...cardsDrawn);
