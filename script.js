@@ -171,16 +171,19 @@ function drawCards(player) {
 	let cardsToDraw = maxHandSize - gameState.players[player].hand.length;
 	let drawPile = gameState.drawPile;
 
-	if (drawPile.length < maxHandSize) {
-		reStock();
-	} else {
-		return;
-	}
-
 	if (cardsToDraw > 0) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
 		gameState.players[player].hand.push(...cardsDrawn);
+		if (drawPile.length < maxHandSize) {
+			reStock();
+		} else {
+			return;
+		}
+	} else {
+		console.log('error drawing cards');
+		return;
 	}
+	reRenderCards();
 }
 
 function endTheTurn() {
@@ -264,7 +267,7 @@ function reStock() {
 function isFullPile(targetPileIndex) {
 	const pile = gameState.buildPiles[targetPileIndex];
 	if (pile.length === 12) {
-		clearFullPlayPile();
+		clearFullPlayPile(targetPileIndex);
 	} else {
 		return;
 	}
@@ -272,6 +275,7 @@ function isFullPile(targetPileIndex) {
 
 function startGame() {
 	addPlayers();
+	addCardsToArray(gameState.drawPile);
 	shuffle(gameState.drawPile);
 	addCardsToStockPile();
 	drawCards(gameState.currentPlayerIndex);
@@ -288,6 +292,17 @@ function createCards() {
 	}
 }
 
+function renderCardsInPile(location) {
+	location.forEach((cardItem) => {
+		createCard(cardItem);
+	});
+}
+
+function reRenderCards(location) {
+	location.innerHTML = '';
+	renderCardsInPile(location);
+}
+
 function determineWinner(playerIndex) {
 	const player = gameState.players[currentPlayerIndex];
 	if (player.stockPile.length === 0) {
@@ -297,5 +312,6 @@ function determineWinner(playerIndex) {
 	}
 }
 
-// startGame();
+startGame();
+renderCardsInPile(gameState.drawPile);
 // createCards();
