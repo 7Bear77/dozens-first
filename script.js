@@ -182,6 +182,7 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 		card = player.hand[cardSourceIndex];
 	} else if (sourceType === 'stock') {
 		card = player.stockPile[player.stockPile.length - 1];
+		determineWinner();
 	} else if (sourceType === 'discard') {
 		card = discardPile[discardPile.length - 1];
 	}
@@ -244,6 +245,15 @@ function createCards() {
 				createCard(cardItem);
 			});
 		}
+	}
+}
+
+function determineWinner(playerIndex) {
+	const player = gameState.players[currentPlayerIndex];
+	if (player.stockPile.length === 0) {
+		console.log('you win the game');
+	} else {
+		return;
 	}
 }
 
