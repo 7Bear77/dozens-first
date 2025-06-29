@@ -1,12 +1,29 @@
 :root {
-	--card-width: 107px;
-	--card-height: 150px;
+	--card-width: 1px;
+	--card-height: 100px;
 }
 
 main {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.control-buttons {
+	border: 1px solid black;
+	position: relative;
+	height: 90vh;
+	display: flex;
+	flex-direction: column;
+	width: 220px;
+}
+
+.hidden {
+	display: none;
+}
+
+button {
+	height: 35px;
 }
 
 .card-container {
@@ -47,7 +64,7 @@ main {
 	transform: rotateY(180deg);
 }
 
-.card:hover .card-inner {
+.draw-pile .card-inner {
 	transform: rotateY(180deg);
 }
 
@@ -76,8 +93,8 @@ main {
 	grid-template-columns: 15% 1fr 15%;
 }
 
-.player-zone.p0,
-.player-zone.p1 {
+.player-zone.pl0,
+.player-zone.pl1 {
 	grid-area: player0;
 	border: 1px solid blue;
 	display: flex;
@@ -99,7 +116,7 @@ main {
 	grid-area: draw;
 	border: 1px solid orange;
 }
-.player-zone.p1 {
+.player-zone.pl1 {
 	grid-area: player1;
 	border: 1px solid blue;
 }
@@ -109,28 +126,52 @@ main {
 	width: 20%;
 }
 
-.p0 > .hand-zone,
-.p1 > .hand-zone {
+.pl0 > .hand-zone,
+.pl1 > .hand-zone {
 	border: 1px solid chocolate;
 	width: 40%;
 }
 
-.p0 > .discard-pile-zone,
-.p1 > .discard-pile-zone {
+.pl0 > .discard-pile-zone,
+.pl1 > .discard-pile-zone {
 	border: 1px solid grey;
 	width: 40%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-.p0 > .discard-pile-zone > .discard-pile,
-.p1 > .discard-pile-zone > .discard-pile {
+.pl0 > .discard-pile-zone > .discard-pile,
+.pl1 > .discard-pile-zone > .discard-pile {
 	border: 1px solid black;
 }
 
-.p0 > .stock-pile,
-.p1 > .stock-pile {
+.pl0 > .stock-pile,
+.pl1 > .stock-pile {
 	border: 1px solid tomato;
 	width: 15%;
 	margin-left: auto;
+}
+
+.hand-zone {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	position: relative;
+}
+
+.hand-zone .card:nth-child(1) {
+	left: 0px;
+}
+.hand-zone .card:nth-child(2) {
+	left: 20%;
+}
+.hand-zone .card:nth-child(3) {
+	left: 40%;
+}
+.hand-zone .card:nth-child(4) {
+	left: 60%;
+}
+.hand-zone .card:nth-child(5) {
+	left: 80%;
 }

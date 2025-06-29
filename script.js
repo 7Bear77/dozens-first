@@ -27,31 +27,21 @@ let globalCardIdCounter = 1;
 
 const cardContainerElem = document.querySelector('.card-container');
 const toBeShuffledDiv = document.querySelector('.to-be-shuffled');
-const drawPileDiv = document.querySelector('.draw-pile');
-const playPile0Div = document.querySelector('.play-pile.p0');
-const playPile1Div = document.querySelector('.play-pile.p1');
-const playPile2Div = document.querySelector('.play-pile.p2');
-const playPile3Div = document.querySelector('.play-pile.p3');
-const player0HandDiv = document.querySelector('.p0 .hand-zone');
-const player0Discard0Div = document.querySelector('.p0 .discard-pile-zone .d0');
-const player0Discard1Div = document.querySelector('.p0 .discard-pile-zone .d1');
-const player0Discard2Div = document.querySelector('.p0 .discard-pile-zone .d2');
-const player0Discard3Div = document.querySelector('.p0 .discard-pile-zone .d3');
-const player0StockPileDiv = document.querySelector('.p0 .stock-pile');
-const player1HandDiv = document.querySelector('.p1 .hand-zone');
-const player1Discard0Div = document.querySelector('.p1 .discard-pile-zone .d0');
-const player1Discard1Div = document.querySelector('.p1 .discard-pile-zone .d1');
-const player1Discard2Div = document.querySelector('.p1 .discard-pile-zone .d2');
-const player1Discard3Div = document.querySelector('.p1 .discard-pile-zone .d3');
-const player1StockPileDiv = document.querySelector('.p1 .stock-pile');
 
-function addCardsToArray(location) {
-	const cards = Array.from({ length: numOfSets }).flatMap(() =>
-		cardObjectDefinitions.map((card) => ({
-			...card,
-		}))
-	);
-	location.push(...cards);
+const DOM = {
+	drawPile: document.querySelector('.draw-pile'),
+	playPiles: document.querySelectorAll('.play-pile'),
+};
+
+function getPlayerZone(playerIndex) {
+	const root = document.querySelector(`.pl${playerIndex}`);
+	console.log('getPlayerZone sucessful' + root);
+	return {
+		root,
+		handZone: root.querySelector('.hand-zone'),
+		stockZone: root.querySelector('.stock-pile'),
+		discardZones: root.querySelectorAll('.discard-pile-zone .discard-pile'),
+	};
 }
 
 const gameState = {
@@ -99,7 +89,7 @@ function createCard(cardItem) {
 	addChildElement(cardElem, cardInnerElem);
 
 	//add the cards to the container
-	addChildElement(drawPileDiv, cardElem);
+	return cardElem;
 }
 
 // will create an html element of elemType
@@ -146,6 +136,7 @@ function shuffle(array) {
 			array[currentIndex],
 		];
 	}
+	renderAllZones();
 }
 
 function addPlayers() {
@@ -174,6 +165,7 @@ function drawCards(player) {
 	if (cardsToDraw > 0) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
 		gameState.players[player].hand.push(...cardsDrawn);
+		renderAllZones();
 		if (drawPile.length < maxHandSize) {
 			reStock();
 		} else {
@@ -183,12 +175,12 @@ function drawCards(player) {
 		console.log('error drawing cards');
 		return;
 	}
-	reRenderCards();
 }
 
 function endTheTurn() {
 	gameState.currentPlayerIndex =
 		(gameState.currentPlayerIndex + 1) % numOfPlayers;
+	renderAllZones();
 }
 
 function isValidMove(card, buildPile) {
@@ -225,7 +217,7 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 		card = player.hand[cardSourceIndex];
 	} else if (sourceType === 'stock') {
 		card = player.stockPile[player.stockPile.length - 1];
-		determineWinner();
+		determineWinner(playerIndex);
 	} else if (sourceType === 'discard') {
 		card = discardPile[discardPile.length - 1];
 	}
@@ -244,6 +236,7 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 		console.log('Invalid Move');
 		return;
 	}
+	renderAllZones();
 }
 
 function discardCard(playerIndex, cardSourceIndex, targetPileIndex) {
@@ -275,11 +268,11 @@ function isFullPile(targetPileIndex) {
 
 function startGame() {
 	addPlayers();
-	addCardsToArray(gameState.drawPile);
+	const allCards = addCardsToArray(gameState.drawPile);
 	shuffle(gameState.drawPile);
 	addCardsToStockPile();
 	drawCards(gameState.currentPlayerIndex);
-	console.log(gameState);
+	renderAllZones();
 }
 
 function createCards() {
@@ -292,19 +285,43 @@ function createCards() {
 	}
 }
 
-function renderCardsInPile(location) {
-	location.forEach((cardItem) => {
-		createCard(cardItem);
+function addCardsToArray(location) {
+	const cards = Array.from({ length: numOfSets }).flatMap(() =>
+		cardObjectDefinitions.map((card) => ({
+			...card,
+		}))
+	);
+	location.push(...cards);
+	return cards;
+}
+
+function renderPile(cards, container, options = {}) {
+	container.innerHTML = '';
+	cards.forEach((card) => {
+		const cardEl = createCard(card, options);
+		container.appendChild(cardEl);
 	});
 }
 
-function reRenderCards(location) {
-	location.innerHTML = '';
-	renderCardsInPile(location);
+function renderAllZones() {
+	renderPile(gameState.drawPile, DOM.drawPile);
+	gameState.buildPiles.forEach((pile, i) => {
+		renderPile(pile, DOM.playPiles[i]);
+	});
+	gameState.players.forEach((player, playerIndex) => {
+		const playerZone = getPlayerZone(playerIndex);
+		renderPile(player.hand, playerZone.handZone);
+		if (playerZone.stockZone) {
+			renderPile(player.stockPile, playerZone.stockZone);
+		}
+		player.discardPiles.forEach((discardPile, dIndex) => {
+			renderPile(discardPile, playerZone.discardZones[dIndex]);
+		});
+	});
 }
 
 function determineWinner(playerIndex) {
-	const player = gameState.players[currentPlayerIndex];
+	const player = gameState.players[playerIndex];
 	if (player.stockPile.length === 0) {
 		console.log('you win the game');
 	} else {
@@ -312,6 +329,88 @@ function determineWinner(playerIndex) {
 	}
 }
 
-startGame();
-renderCardsInPile(gameState.drawPile);
-// createCards();
+function hideFunctions() {
+	let functions = document.querySelector('.control-buttons');
+	functions.classList.toggle('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+	document.querySelector('.log-game-state').addEventListener('click', () => {
+		console.log(gameState);
+	});
+	document.querySelector('.hide').addEventListener('click', hideFunctions);
+	// document.querySelector('.get-player-zone').addEventListener('click', () => {
+	// 	getPlayerZone(Number(prompt('playerIndex')));
+	// });
+	// document.querySelector('.create-card').addEventListener('click', () => {
+	// 	createCard(cardObjectDefinitions[prompt('cardItem')]);
+	// });
+	document.querySelector('.render').addEventListener('click', renderAllZones);
+	document.querySelector('.shuffle').addEventListener('click', () => {
+		shuffle(prompt(prompt('array')));
+	});
+	// document.querySelector('.add-players').addEventListener('click', () => {
+	// 	addPlayers();
+	// });
+	document.querySelector('.add-cards-to-stock-pile');
+	// .addEventListener('click', () => {
+	// 	addCardsToStockPile();
+	// });
+	document.querySelector('.draw-cards').addEventListener('click', () => {
+		drawCards(Number(prompt('player')));
+	});
+	document.querySelector('.end-the-turn').addEventListener('click', () => {
+		endTheTurn();
+	});
+	document.querySelector('.is-valid-move').addEventListener('click', () => {
+		isValidMove(prompt('cardObjectDefinitions[0]'), prompt('buildpile'));
+	});
+	document.querySelector('.play-card').addEventListener('click', () => {
+		playCard(
+			prompt('playerIndex'),
+			prompt('sourceType'),
+			prompt('cardSourceIndex'),
+			prompt('targetPileIndex')
+		);
+	});
+	document.querySelector('.discard-card').addEventListener('click', () => {
+		discardCard(
+			Number(prompt('playerIndex')),
+			Number(prompt('cardSourceIndex')),
+			Number(prompt('targetPileIndex'))
+		);
+	});
+	document
+		.querySelector('.clear-full-play-pile')
+		.addEventListener('click', () => {
+			clearFullPlayPile(0);
+		});
+	document.querySelector('.re-stock').addEventListener('click', () => {
+		reStock();
+	});
+	// document.querySelector('.is-full-pile').addEventListener('click', () => {
+	// isFullPile(0);
+	// });
+	document.querySelector('.start-game').addEventListener('click', () => {
+		startGame();
+	});
+	// document.querySelector('.create-cards').addEventListener('click', () => {
+	// 	createCards();
+	// });
+	document;
+	// .querySelector('.add-cards-to-array')
+	// .addEventListener('click', () => {
+	// 	addCardsToArray(prompt('gameState.drawPile'));
+	// });
+	document.querySelector('.render-pile').addEventListener('click', () => {
+		renderPile(
+			prompt('gameState.drawPile'),
+			prompt('document.querySelector(".draw-pile")')
+		);
+	});
+	document
+		.querySelector('.determine-winner')
+		.addEventListener('click', () => {
+			determineWinner(gameState.currentPlayerIndex);
+		});
+});

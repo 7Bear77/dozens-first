@@ -8,9 +8,36 @@
 		<title>Dozens v.0.01</title>
 	</head>
 	<body>
-		<header></header>
+		<header><button class="hide">Show/Hide Functions</button></header>
 		<main>
 			<div class="card-container"></div>
+			<div class="control-buttons">
+				<h4>Functions</h4>
+				<button class="log-game-state">log gameState</button>
+				<!-- <button class="get-player-zone">getPlayerZone()</button> -->
+				<!-- <button class="create-card">createCard()</button> -->
+				<button class="shuffle">shuffle()</button>
+				<!-- <button class="add-players">addPlayers()</button> -->
+				<!-- <button class="add-cards-to-stock-pile">
+					addCardsToStockPile()
+				</button> -->
+				<button class="draw-cards">drawCards()</button>
+				<button class="end-the-turn">endTheTurn()</button>
+				<button class="is-valid-move">isValidMove()</button>
+				<button class="play-card">playCard()</button>
+				<button class="discard-card">discardCard()</button>
+				<button class="clear-full-play-pile">
+					clearFullPlayPile()
+				</button>
+				<button class="re-stock">reStock()</button>
+				<!-- <button class="is-full-pile">isFullPile()</button> -->
+				<button class="start-game">startGame()</button>
+				<!-- <button class="create-cards">createCards()</button> -->
+				<!-- <button class="add-cards-to-array">addCardsToArray()</button> -->
+				<button class="render-pile">renderPile()</button>
+				<button class="determine-winner">determineWinner()</button>
+				<button class="render">Render Zones</button>
+			</div>
 			<div class="game-board">
 				<div class="to-be-shuffled"></div>
 				<div class="draw-pile"></div>
@@ -20,7 +47,7 @@
 					<div class="play-pile p2"></div>
 					<div class="play-pile p3"></div>
 				</div>
-				<div class="player-zone p0">
+				<div class="player-zone pl1">
 					<div class="hand-zone"></div>
 					<div class="discard-pile-zone">
 						<div class="discard-pile d0"></div>
@@ -30,7 +57,7 @@
 					</div>
 					<div class="stock-pile"></div>
 				</div>
-				<div class="player-zone p1">
+				<div class="player-zone pl0">
 					<div class="hand-zone"></div>
 					<div class="discard-pile-zone">
 						<div class="discard-pile d0"></div>
