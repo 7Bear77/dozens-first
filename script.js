@@ -33,6 +33,14 @@ const DOM = {
 	playPiles: document.querySelectorAll('.play-pile'),
 };
 
+const gameState = {
+	drawPile: [],
+	buildPiles: [[], [], [], []],
+	players: [],
+	cardsToBeShuffled: [],
+	currentPlayerIndex: 0,
+};
+
 function getPlayerZone(playerIndex) {
 	const root = document.querySelector(`.pl${playerIndex}`);
 	console.log('getPlayerZone sucessful' + root);
@@ -44,80 +52,57 @@ function getPlayerZone(playerIndex) {
 	};
 }
 
-const gameState = {
-	drawPile: [],
-	buildPiles: [[], [], [], []],
-	players: [],
-	cardsToBeShuffled: [],
-	currentPlayerIndex: 0,
-};
-
-// dynamically creates our card
 function createCard(cardItem) {
-	// create the div elements that make up the bones of the card
 	const cardElem = createElement('div');
 	const cardInnerElem = createElement('div');
 	const cardFrontElem = createElement('div');
 	const cardBackElem = createElement('div');
 
-	// create images for the card
 	const cardFrontImg = createElement('img');
 	const cardBackImg = createElement('img');
 
-	//adds classes to the appropriate elements
 	addClassToElement(cardElem, 'card');
 	addClassToElement(cardInnerElem, 'card-inner');
 	addClassToElement(cardFrontElem, 'card-front');
 	addClassToElement(cardBackElem, 'card-back');
 
-	//adds id to card based on id in our library
 	addIdToElement(cardElem, cardItem.id);
 
-	//add src attribute and appropriate value to the img element
 	addSrcToImageElem(cardFrontImg, cardItem.imagePath);
 	addSrcToImageElem(cardBackImg, cardBackImgPath);
 
-	//assign class to imgs of the card
 	addClassToElement(cardFrontImg, 'card-img');
 	addClassToElement(cardBackImg, 'card-img');
 
-	//apply propper parent-child relationships, starting with 'youngest' to 'oldest'
 	addChildElement(cardFrontElem, cardFrontImg);
 	addChildElement(cardBackElem, cardBackImg);
 	addChildElement(cardInnerElem, cardFrontElem);
 	addChildElement(cardInnerElem, cardBackElem);
 	addChildElement(cardElem, cardInnerElem);
 
-	//add the cards to the container
 	return cardElem;
 }
 
-// will create an html element of elemType
 function createElement(elemType) {
 	return document.createElement(elemType);
 }
 
-// will add a class to an html element
 function addClassToElement(elem, className) {
 	elem.classList.add(className);
 }
 
-// will remove a class from an html element
 function removeClassFromElement(elem, className) {
 	elem.classList.remove(className);
 }
 
-// will add a unique id to the element
 function addIdToElement(elem, id) {
 	elem.id = id;
 }
 
-// will add appropriate path for img elements
 function addSrcToImageElem(imgElem, src) {
 	imgElem.src = src;
 }
 
-// creates a parent-child relationship between elems on the DOM
 function addChildElement(parentElem, childElem) {
 	if (parentElem) {
 		parentElem.appendChild(childElem);
@@ -339,23 +324,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log(gameState);
 	});
 	document.querySelector('.hide').addEventListener('click', hideFunctions);
-	// document.querySelector('.get-player-zone').addEventListener('click', () => {
-	// 	getPlayerZone(Number(prompt('playerIndex')));
-	// });
-	// document.querySelector('.create-card').addEventListener('click', () => {
-	// 	createCard(cardObjectDefinitions[prompt('cardItem')]);
-	// });
+
 	document.querySelector('.render').addEventListener('click', renderAllZones);
 	document.querySelector('.shuffle').addEventListener('click', () => {
 		shuffle(prompt(prompt('array')));
 	});
-	// document.querySelector('.add-players').addEventListener('click', () => {
-	// 	addPlayers();
-	// });
-	document.querySelector('.add-cards-to-stock-pile');
-	// .addEventListener('click', () => {
-	// 	addCardsToStockPile();
-	// });
+
 	document.querySelector('.draw-cards').addEventListener('click', () => {
 		drawCards(Number(prompt('player')));
 	});
@@ -388,20 +362,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.querySelector('.re-stock').addEventListener('click', () => {
 		reStock();
 	});
-	// document.querySelector('.is-full-pile').addEventListener('click', () => {
-	// isFullPile(0);
-	// });
+
 	document.querySelector('.start-game').addEventListener('click', () => {
 		startGame();
 	});
-	// document.querySelector('.create-cards').addEventListener('click', () => {
-	// 	createCards();
-	// });
-	document;
-	// .querySelector('.add-cards-to-array')
-	// .addEventListener('click', () => {
-	// 	addCardsToArray(prompt('gameState.drawPile'));
-	// });
+
 	document.querySelector('.render-pile').addEventListener('click', () => {
 		renderPile(
 			prompt('gameState.drawPile'),
