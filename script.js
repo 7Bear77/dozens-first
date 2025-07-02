@@ -326,59 +326,55 @@ let selectedCard = {
 
 gameBoard.addEventListener('click', (event) => {
 	const cardEl = event.target.closest('.card');
-	if (!cardEl) return;
-	const discardPileChoice = event.target.closest('.discard-pile');
-	const playPileChoice = event.target.closest('.play-pile');
-	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-	const playerHand = currentPlayer.hand;
-	const player = cardEl.closest('[class^="pl"]');
-	const discard = cardEl.closest('[class^="d"]');
-	let discardPos;
-	let cardPos;
+	const discardPileEl = event.target.closest('.discard-pile');
+	const playerZone = event.target.closest('[class^="pl"]');
 	let playerIndex = null;
-	let zoneType = null;
 
-	if (player) {
-		const playerClasses = Array.from(player.classList);
-		const plClass = playerClasses.find((cls) => /^pl\d+$/.test(cls));
+	if (playerZone) {
+		const plClass = Array.from(playerZone.classList).find((cls) =>
+			/^pl\d+$/.test(cls)
+		);
 		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
 	}
 
-	if (cardEl.closest('.hand-zone')) {
-		zoneType = 'hand';
-		cardPos = playerHand.findIndex((card) => card.id === Number(cardEl.id));
-	} else if (cardEl.closest('.discard-pile')) {
-		zoneType = 'discard';
-		const discardClasses = Array.from(discard.classList);
-		const discardPile = discardClasses.find((cls) => /^d\d+$/.test(cls));
-		discardPos = discardPile ? Number(discardPile.replace('d', '')) : null;
-	} else if (cardEl.closest('.stock-pile')) {
-		zoneType = 'stock';
+	if (
+		cardEl &&
+		cardEl.closest('.hand-zone') &&
+		playerIndex === gameState.currentPlayerIndex
+	) {
+		const playerHand = gameState.players[playerIndex].hand;
+		const cardIndex = playerHand.findIndex(
+			(card) => card.id === Number(cardEl.id)
+		);
+		selectedCard = {
+			playerIndex,
+			sourceType: 'hand',
+			cardIndex,
+			cardEl,
+		};
+		console.log('Card selected:', selectedCard);
+		return;
 	}
 
-	if (zoneType == 'stock') {
-		cardPos = currentPlayer.stockPile.length - 1;
-		console.log('stock pile ' + cardPos);
-	} else if (zoneType == 'discard') {
-		cardPos = currentPlayer.discardPiles[discardPos].length - 1;
-		console.log('discard ' + cardPos);
-	} else if (zoneType == 'hand') {
-		cardPos = cardPos;
-		console.log('hand ' + cardPos);
-	}
-
-	if (playerIndex === gameState.currentPlayerIndex) {
-		if (!selectedCard.cardEl) {
+	if (discardPileEl && selectedCard.cardEl) {
+		const discardClasses = Array.from(discardPileEl.classList);
+		const discardClass = discardClasses.find((cls) => /^d\d+$/.test(cls));
+		const discardIndex = discardClass
+			? Number(discardClass.replace('d', ''))
+			: null;
+		if (discardIndex !== null) {
+			discardCard(
+				selectedCard.playerIndex,
+				selectedCard.cardIndex,
+				discardIndex
+			);
 			selectedCard = {
-				playerIndex,
-				sourceType: zoneType,
-				cardIndex: cardPos,
-				cardEl: cardEl,
+				playerIndex: null,
+				sourceType: null,
+				cardIndex: null,
+				cardEl: null,
 			};
-			console.log(selectedCard);
 		}
-	} else {
-		console.log('not your card to play!');
 		return;
 	}
 });
