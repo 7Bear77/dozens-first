@@ -333,6 +333,7 @@ gameBoard.addEventListener('click', (event) => {
 	const playerHand = currentPlayer.hand;
 	const player = cardEl.closest('[class^="pl"]');
 	const discard = cardEl.closest('[class^="d"]');
+	let discardPos;
 	let cardPos;
 	let playerIndex = null;
 	let zoneType = null;
@@ -350,7 +351,7 @@ gameBoard.addEventListener('click', (event) => {
 		zoneType = 'discard';
 		const discardClasses = Array.from(discard.classList);
 		const discardPile = discardClasses.find((cls) => /^d\d+$/.test(cls));
-		cardPos = discardPile ? Number(discardPile.replace('d', '')) : null;
+		discardPos = discardPile ? Number(discardPile.replace('d', '')) : null;
 	} else if (cardEl.closest('.stock-pile')) {
 		zoneType = 'stock';
 	}
@@ -359,7 +360,7 @@ gameBoard.addEventListener('click', (event) => {
 		cardPos = currentPlayer.stockPile.length - 1;
 		console.log('stock pile ' + cardPos);
 	} else if (zoneType == 'discard') {
-		cardPos = currentPlayer.discardPiles[cardPos].length - 1;
+		cardPos = currentPlayer.discardPiles[discardPos].length - 1;
 		console.log('discard ' + cardPos);
 	} else if (zoneType == 'hand') {
 		cardPos = cardPos;
