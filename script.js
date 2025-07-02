@@ -43,7 +43,6 @@ const gameState = {
 
 function getPlayerZone(playerIndex) {
 	const root = document.querySelector(`.pl${playerIndex}`);
-	console.log('getPlayerZone sucessful' + root);
 	return {
 		root,
 		handZone: root.querySelector('.hand-zone'),
@@ -169,10 +168,7 @@ function endTheTurn() {
 }
 
 function isValidMove(card, buildPile) {
-	const topCard = buildPile[buildPile.length - 1];
-	const topCardValue = topCard?.id ?? 0;
-	const cardValue = card.id;
-	const nextRequiredCard = topCardValue + 1;
+	const nextRequiredCard = buildPile.length + 1;
 	return card.id === nextRequiredCard || card.id === 13;
 }
 
@@ -274,6 +270,7 @@ function addCardsToArray(location) {
 	const cards = Array.from({ length: numOfSets }).flatMap(() =>
 		cardObjectDefinitions.map((card) => ({
 			...card,
+			instanceId: globalCardIdCounter++,
 		}))
 	);
 	location.push(...cards);
@@ -319,25 +316,78 @@ function hideFunctions() {
 	functions.classList.toggle('hidden');
 }
 
+const gameBoard = document.querySelector('.game-board');
+let selectedCard = {
+	playerIndex: null,
+	sourceType: null,
+	cardIndex: null,
+	cardEl: null,
+};
+
+gameBoard.addEventListener('click', (event) => {
+	const cardEl = event.target.closest('.card');
+	if (!cardEl) return;
+	const discardPileChoice = event.target.closest('.discard-pile');
+	const playPileChoice = event.target.closest('.play-pile');
+	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+	const playerHand = currentPlayer.hand;
+	const player = cardEl.closest('[class^="pl"]');
+	const discard = cardEl.closest('[class^="d"]');
+	let cardPos;
+	let playerIndex = null;
+	let zoneType = null;
+
+	if (player) {
+		const playerClasses = Array.from(player.classList);
+		const plClass = playerClasses.find((cls) => /^pl\d+$/.test(cls));
+		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
+	}
+
+	if (cardEl.closest('.hand-zone')) {
+		zoneType = 'hand';
+		cardPos = playerHand.findIndex((card) => card.id === Number(cardEl.id));
+	} else if (cardEl.closest('.discard-pile')) {
+		zoneType = 'discard';
+		const discardClasses = Array.from(discard.classList);
+		const discardPile = discardClasses.find((cls) => /^d\d+$/.test(cls));
+		cardPos = discardPile ? Number(discardPile.replace('d', '')) : null;
+	} else if (cardEl.closest('.stock-pile')) {
+		zoneType = 'stock';
+	}
+
+	if (zoneType == 'stock') {
+		cardPos = currentPlayer.stockPile.length - 1;
+		console.log('stock pile ' + cardPos);
+	} else if (zoneType == 'discard') {
+		cardPos = currentPlayer.discardPiles[cardPos].length - 1;
+		console.log('discard ' + cardPos);
+	} else if (zoneType == 'hand') {
+		cardPos = cardPos;
+		console.log('hand ' + cardPos);
+	}
+
+	if (playerIndex === gameState.currentPlayerIndex) {
+		if (!selectedCard.cardEl) {
+			selectedCard = {
+				playerIndex,
+				sourceType: zoneType,
+				cardIndex: cardPos,
+				cardEl: cardEl,
+			};
+			console.log(selectedCard);
+		}
+	} else {
+		console.log('not your card to play!');
+		return;
+	}
+});
+
 document.addEventListener('DOMContentLoaded', () => {
+	document.querySelector('.start-game').addEventListener('click', () => {
+		startGame();
+	});
 	document.querySelector('.log-game-state').addEventListener('click', () => {
 		console.log(gameState);
-	});
-	document.querySelector('.hide').addEventListener('click', hideFunctions);
-
-	document.querySelector('.render').addEventListener('click', renderAllZones);
-	document.querySelector('.shuffle').addEventListener('click', () => {
-		shuffle(prompt(prompt('array')));
-	});
-
-	document.querySelector('.draw-cards').addEventListener('click', () => {
-		drawCards(Number(prompt('player')));
-	});
-	document.querySelector('.end-the-turn').addEventListener('click', () => {
-		endTheTurn();
-	});
-	document.querySelector('.is-valid-move').addEventListener('click', () => {
-		isValidMove(prompt('cardObjectDefinitions[0]'), prompt('buildpile'));
 	});
 	document.querySelector('.play-card').addEventListener('click', () => {
 		playCard(
@@ -348,34 +398,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 	});
 	document.querySelector('.discard-card').addEventListener('click', () => {
-		discardCard(
-			Number(prompt('playerIndex')),
-			Number(prompt('cardSourceIndex')),
-			Number(prompt('targetPileIndex'))
-		);
+		discardCard(gameState.currentPlayerIndex, 0, 0);
 	});
-	document
-		.querySelector('.clear-full-play-pile')
-		.addEventListener('click', () => {
-			clearFullPlayPile(0);
-		});
+	document.querySelector('.draw-cards').addEventListener('click', () => {
+		drawCards(gameState.currentPlayerIndex);
+	});
 	document.querySelector('.re-stock').addEventListener('click', () => {
 		reStock();
 	});
-
-	document.querySelector('.start-game').addEventListener('click', () => {
-		startGame();
-	});
-
-	document.querySelector('.render-pile').addEventListener('click', () => {
-		renderPile(
-			prompt('gameState.drawPile'),
-			prompt('document.querySelector(".draw-pile")')
-		);
-	});
-	document
-		.querySelector('.determine-winner')
-		.addEventListener('click', () => {
-			determineWinner(gameState.currentPlayerIndex);
-		});
+	document.querySelector('.render').addEventListener('click', renderAllZones);
+	document.querySelector('.hide').addEventListener('click', hideFunctions);
 });
