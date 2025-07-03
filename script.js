@@ -173,7 +173,7 @@ function isValidMove(card, buildPile) {
 }
 
 function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
-	const player = gameState.players[playerIndex];
+	const player = gameState.players[gameState.currentPlayerIndex];
 	let source;
 
 	switch (sourceType) {
@@ -193,14 +193,16 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 
 	let card;
 	const discardPile = player.discardPiles[cardSourceIndex];
-
 	if (sourceType === 'hand') {
 		card = player.hand[cardSourceIndex];
 	} else if (sourceType === 'stock') {
 		card = player.stockPile[player.stockPile.length - 1];
 		determineWinner(playerIndex);
 	} else if (sourceType === 'discard') {
-		card = discardPile[discardPile.length - 1];
+		card =
+			player.discardPiles[cardSourceIndex][
+				player.discardPiles[cardSourceIndex].length - 1
+			];
 	}
 
 	if (isValidMove(card, gameState.buildPiles[targetPileIndex])) {
@@ -208,6 +210,13 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 		isFullPile(targetPileIndex);
 		if (sourceType === 'hand') {
 			player.hand.splice(cardSourceIndex, 1);
+			if (player.hand.length === 0) {
+				drawCards(gameState.currentPlayerIndex);
+				renderAllZones();
+			} else {
+				renderAllZones();
+				return;
+			}
 		} else if (sourceType === 'discard') {
 			discardPile.pop();
 		} else if (sourceType === 'stock') {
@@ -226,6 +235,7 @@ function discardCard(playerIndex, cardSourceIndex, targetPileIndex) {
 	player.discardPiles[targetPileIndex].push(card);
 	player.hand.splice(cardSourceIndex, 1);
 	endTheTurn();
+	drawCards(gameState.currentPlayerIndex);
 }
 
 function clearFullPlayPile(targetPileIndex) {
@@ -327,6 +337,8 @@ let selectedCard = {
 gameBoard.addEventListener('click', (event) => {
 	const cardEl = event.target.closest('.card');
 	const discardPileEl = event.target.closest('.discard-pile');
+	const playPileEl = event.target.closest('.play-pile');
+	const stockPileEl = event.target.closest('.stock-pile');
 	const playerZone = event.target.closest('[class^="pl"]');
 	let playerIndex = null;
 
@@ -352,11 +364,50 @@ gameBoard.addEventListener('click', (event) => {
 			cardIndex,
 			cardEl,
 		};
-		console.log('Card selected:', selectedCard);
+		console.log('Card selected from hand:', selectedCard);
+		return;
+	} else if (
+		cardEl &&
+		cardEl.closest('.stock-pile') &&
+		playerIndex === gameState.currentPlayerIndex
+	) {
+		const playerStockPile = gameState.players[playerIndex].stockPile;
+		const cardIndex = playerStockPile.length - 1;
+		selectedCard = {
+			playerIndex,
+			sourceType: 'stock',
+			cardIndex,
+			cardEl,
+		};
+		console.log('Card selected from stock pile:', selectedCard);
+		return;
+	} else if (
+		cardEl &&
+		cardEl.closest('.discard-pile') &&
+		playerIndex === gameState.currentPlayerIndex
+	) {
+		const discardPileEl = cardEl.closest('.discard-pile');
+		const discardClasses = Array.from(discardPileEl.classList);
+		const discardClass = discardClasses.find((cls) => /^d\d+$/.test(cls));
+		const discardPileIndex = discardClass
+			? Number(discardClass.replace('d', ''))
+			: null;
+		selectedCard = {
+			playerIndex,
+			sourceType: 'discard',
+			cardIndex: discardPileIndex,
+			cardEl,
+		};
+		console.log('Card selected from discard pile:', selectedCard);
 		return;
 	}
 
-	if (discardPileEl && selectedCard.cardEl) {
+	// discard card function
+	if (
+		discardPileEl &&
+		selectedCard.cardEl &&
+		selectedCard.sourceType === 'hand'
+	) {
 		const discardClasses = Array.from(discardPileEl.classList);
 		const discardClass = discardClasses.find((cls) => /^d\d+$/.test(cls));
 		const discardIndex = discardClass
@@ -376,6 +427,27 @@ gameBoard.addEventListener('click', (event) => {
 			};
 		}
 		return;
+	}
+
+	// play card function
+	if (playPileEl && selectedCard.cardEl) {
+		const playPileClasses = Array.from(playPileEl.classList);
+		const playPileClass = playPileClasses.find((cls) => /^p\d+$/.test(cls));
+		const playPileIndex = playPileClass
+			? Number(playPileClass.replace('p', ''))
+			: null;
+		playCard(
+			selectedCard.playerIndex,
+			selectedCard.sourceType,
+			selectedCard.cardIndex,
+			playPileIndex
+		);
+		selectedCard = {
+			playerIndex: null,
+			sourceType: null,
+			cardIndex: null,
+			cardEl: null,
+		};
 	}
 });
 
