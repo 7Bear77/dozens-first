@@ -24,6 +24,7 @@ const numOfPlayers = 2;
 const numOfSets = 12;
 const maxHandSize = 5;
 let globalCardIdCounter = 1;
+let discardPileIncrement = 5;
 
 const cardContainerElem = document.querySelector('.card-container');
 const toBeShuffledDiv = document.querySelector('.to-be-shuffled');
@@ -290,8 +291,15 @@ function addCardsToArray(location) {
 
 function renderPile(cards, container, options = {}) {
 	container.innerHTML = '';
-	cards.forEach((card) => {
+	const isDiscardPile = container.classList.contains('discard-pile');
+	const offset = 20;
+
+	cards.forEach((card, i) => {
 		const cardEl = createCard(card, options);
+		if (isDiscardPile) {
+			cardEl.style.top = `${i * offset}px`;
+			cardEl.style.zIndex = i;
+		}
 		container.appendChild(cardEl);
 	});
 }
