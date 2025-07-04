@@ -31,6 +31,7 @@ const toBeShuffledDiv = document.querySelector('.to-be-shuffled');
 const DOM = {
 	drawPile: document.querySelector('.draw-pile'),
 	playPiles: document.querySelectorAll('.play-pile'),
+	cardsToShuffle: document.querySelector('.to-be-shuffled'),
 };
 
 const gameState = {
@@ -297,6 +298,7 @@ function renderPile(cards, container, options = {}) {
 
 function renderAllZones() {
 	renderPile(gameState.drawPile, DOM.drawPile);
+	renderPile(gameState.cardsToBeShuffled, DOM.cardsToShuffle);
 	gameState.buildPiles.forEach((pile, i) => {
 		renderPile(pile, DOM.playPiles[i]);
 	});

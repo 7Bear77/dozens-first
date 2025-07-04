@@ -1,6 +1,6 @@
 :root {
+	--card-height: 120px;
 	--card-width: 1px;
-	--card-height: 100px;
 }
 
 main {
@@ -26,17 +26,14 @@ button {
 	height: 35px;
 }
 
-.card-container {
-	margin-top: 30px;
-	position: relative;
-}
-
 .card {
 	position: absolute;
+	aspect-ratio: 63 / 88;
 	height: var(--card-height);
 	width: var(--card-width);
 	perspective: 1000px;
 	cursor: pointer;
+	border-radius: 50%;
 }
 
 .card-inner {
@@ -68,6 +65,10 @@ button {
 	transform: rotateY(180deg);
 }
 
+.to-be-shuffled .card-inner {
+	transform: rotateY(180deg);
+}
+
 .game-board,
 .draw-pile,
 .play-pile-zone,
@@ -76,7 +77,6 @@ button {
 .hand-zone,
 .discard-pile-zone,
 .discard-pile {
-	/* border: 1px solid black; */
 	gap: 1rem;
 }
 
@@ -89,15 +89,13 @@ button {
 		'completed play draw'
 		'player0 player0 player0';
 	border: 1px solid black;
-	grid-template-rows: 1fr 1fr 1fr;
+	grid-template-rows: 4fr 2fr 4fr;
 	grid-template-columns: 15% 1fr 15%;
 }
 
-.player-zone.pl0,
-.player-zone.pl1 {
-	grid-area: player0;
+.pl1 {
+	grid-area: player1;
 	border: 1px solid blue;
-	display: flex;
 }
 
 .to-be-shuffled {
@@ -116,8 +114,9 @@ button {
 	grid-area: draw;
 	border: 1px solid orange;
 }
-.player-zone.pl1 {
-	grid-area: player1;
+
+.pl0 {
+	grid-area: player0;
 	border: 1px solid blue;
 }
 
@@ -128,14 +127,13 @@ button {
 
 .pl0 > .hand-zone,
 .pl1 > .hand-zone {
-	border: 1px solid chocolate;
-	width: 40%;
+	width: 20%;
 }
 
 .pl0 > .discard-pile-zone,
 .pl1 > .discard-pile-zone {
 	border: 1px solid grey;
-	width: 40%;
+	width: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 }
@@ -148,7 +146,7 @@ button {
 .pl0 > .stock-pile,
 .pl1 > .stock-pile {
 	border: 1px solid tomato;
-	width: 15%;
+	width: 100%;
 	margin-left: auto;
 }
 
@@ -160,18 +158,58 @@ button {
 	position: relative;
 }
 
+.pl0 {
+	display: grid;
+	grid-template-areas:
+		'discard discard stock'
+		'. hand .';
+	grid-template-rows: 2fr 1fr;
+	grid-template-columns: 1fr 4fr 1fr;
+	gap: 1rem;
+}
+
+.pl1 {
+	display: grid;
+	grid-template-areas:
+		'. hand .'
+		'discard discard stock';
+	grid-template-rows: 1fr 2fr;
+	grid-template-columns: 1fr 4fr 1fr;
+	gap: 1rem;
+}
+
+.pl0 > .discard-pile-zone,
+.pl1 > .discard-pile-zone {
+	grid-area: discard;
+}
+
+.pl0 > .stock-pile,
+.pl1 > .stock-pile {
+	grid-area: stock;
+}
+
+.pl0 > .hand-zone,
+.pl1 > .hand-zone {
+	grid-area: hand;
+}
+
 .hand-zone .card:nth-child(1) {
-	left: 0px;
+	transform: translateY(10px) rotate(-30deg);
+	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(2) {
-	left: 20%;
+	transform: translateY(0) rotate(-15deg);
+	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(3) {
-	left: 40%;
+	transform: translateY(-10px) rotate(0);
+	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(4) {
-	left: 60%;
+	transform: translateY(-15px) rotate(15deg);
+	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(5) {
-	left: 80%;
+	transform: translateY(-20px) rotate(30deg);
+	transform-origin: 50% 100%;
 }
