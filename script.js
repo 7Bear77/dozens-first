@@ -26,13 +26,12 @@ const maxHandSize = 5;
 let globalCardIdCounter = 1;
 let discardPileIncrement = 5;
 
-const cardContainerElem = document.querySelector('.card-container');
-const toBeShuffledDiv = document.querySelector('.to-be-shuffled');
-
 const DOM = {
 	drawPile: document.querySelector('.draw-pile'),
 	playPiles: document.querySelectorAll('.play-pile'),
 	cardsToShuffle: document.querySelector('.to-be-shuffled'),
+	playPileText: document.querySelectorAll('.play-pile-text'),
+	hands: document.querySelectorAll('.hand-zone'),
 };
 
 const gameState = {
@@ -93,7 +92,11 @@ function addClassToElement(elem, className) {
 }
 
 function removeClassFromElement(elem, className) {
-	elem.classList.remove(className);
+	if (elem) {
+		elem.classList.remove(className);
+	} else {
+		console.log('can not add class to undefined element');
+	}
 }
 
 function addIdToElement(elem, id) {
@@ -159,6 +162,7 @@ function drawCards(player) {
 		}
 	} else {
 		console.log('error drawing cards');
+		renderAllZones();
 		return;
 	}
 }
@@ -166,7 +170,24 @@ function drawCards(player) {
 function endTheTurn() {
 	gameState.currentPlayerIndex =
 		(gameState.currentPlayerIndex + 1) % numOfPlayers;
+	updateCurrentPlayerIndicator();
 	renderAllZones();
+}
+
+function updateCurrentPlayerIndicator() {
+	const playerIndex = gameState.currentPlayerIndex;
+	const currentPlayer = gameState.players[playerIndex];
+	const playerHand = DOM.hands[playerIndex];
+	const otherHands = [...DOM.hands];
+	otherHands.splice(playerIndex, 1);
+	if (currentPlayer) {
+		addClassToElement(playerHand, 'green');
+		removeClassFromElement(playerHand, 'red');
+		otherHands.forEach((hand) => {
+			addClassToElement(hand, 'red');
+			removeClassFromElement(hand, 'green');
+		});
+	}
 }
 
 function isValidMove(card, buildPile) {
@@ -210,6 +231,7 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 	if (isValidMove(card, gameState.buildPiles[targetPileIndex])) {
 		gameState.buildPiles[targetPileIndex].push(card);
 		isFullPile(targetPileIndex);
+		updateTopCardText(targetPileIndex);
 		if (sourceType === 'hand') {
 			player.hand.splice(cardSourceIndex, 1);
 			if (player.hand.length === 0) {
@@ -265,6 +287,7 @@ function startGame() {
 	shuffle(gameState.drawPile);
 	addCardsToStockPile();
 	drawCards(gameState.currentPlayerIndex);
+	updateCurrentPlayerIndicator();
 	renderAllZones();
 }
 
@@ -334,6 +357,13 @@ function determineWinner(playerIndex) {
 function hideFunctions() {
 	let functions = document.querySelector('.control-buttons');
 	functions.classList.toggle('hidden');
+}
+
+function updateTopCardText(targetPileIndex) {
+	const playPilesText = DOM.playPileText;
+	const playPilesTextArray = [...playPilesText];
+	const pileLength = gameState.buildPiles[targetPileIndex].length;
+	playPilesTextArray[targetPileIndex].innerHTML = `TOP CARD: ${pileLength}`;
 }
 
 const gameBoard = document.querySelector('.game-board');

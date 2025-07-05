@@ -71,7 +71,7 @@ button {
 
 .game-board,
 .draw-pile,
-.play-pile-zone,
+.play-piles-zone,
 .play-pile,
 .stock-pile,
 .hand-zone,
@@ -89,7 +89,7 @@ button {
 		'completed play draw'
 		'player0 player0 player0';
 	border: 1px solid black;
-	grid-template-rows: 4fr 2fr 4fr;
+	grid-template-rows: 4fr 3fr 4fr;
 	grid-template-columns: 15% 1fr 15%;
 }
 
@@ -120,9 +120,15 @@ button {
 	border: 1px solid blue;
 }
 
-.play-pile {
+.p0-container,
+.p1-container,
+.p2-container,
+.p3-container {
 	border: 1px solid green;
 	width: 20%;
+	grid-area: playpile;
+	display: flex;
+	flex-direction: column;
 }
 
 .pl0 > .hand-zone,
@@ -163,7 +169,7 @@ button {
 	display: grid;
 	grid-template-areas:
 		'discard discard stock'
-		'. hand .';
+		'hand hand hand';
 	grid-template-rows: 2fr 1fr;
 	grid-template-columns: 1fr 4fr 1fr;
 	gap: 1rem;
@@ -172,7 +178,7 @@ button {
 .pl1 {
 	display: grid;
 	grid-template-areas:
-		'. hand .'
+		'hand hand hand'
 		'discard discard stock';
 	grid-template-rows: 1fr 2fr;
 	grid-template-columns: 1fr 4fr 1fr;
@@ -192,6 +198,7 @@ button {
 .pl0 > .hand-zone,
 .pl1 > .hand-zone {
 	grid-area: hand;
+	width: 100%;
 }
 
 .discard-pile {
@@ -205,23 +212,49 @@ button {
 	transition: top 0.2s;
 }
 
+.play-pile {
+	width: 100%;
+	height: 100%;
+}
+
+.play-pile-text {
+	border: 2px solid black;
+	width: 95%;
+	height: 20%;
+	font-size: 0.75rem;
+	text-align: center;
+}
+
+.green {
+	background: green;
+}
+
+.red {
+	background: red;
+}
+
 .hand-zone .card:nth-child(1) {
+	left: 40%;
 	transform: translateY(10px) rotate(-30deg);
 	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(2) {
+	left: 40%;
 	transform: translateY(0) rotate(-15deg);
 	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(3) {
+	left: 40%;
 	transform: translateY(-10px) rotate(0);
 	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(4) {
+	left: 40%;
 	transform: translateY(-15px) rotate(15deg);
 	transform-origin: 50% 100%;
 }
 .hand-zone .card:nth-child(5) {
+	left: 40%;
 	transform: translateY(-20px) rotate(30deg);
 	transform-origin: 50% 100%;
 }
