@@ -25,6 +25,7 @@ const numOfSets = 12;
 const maxHandSize = 5;
 let globalCardIdCounter = 1;
 let discardPileIncrement = 5;
+const additionalWilds = numOfSets / 2;
 
 const DOM = {
 	drawPile: document.querySelector('.draw-pile'),
@@ -307,6 +308,13 @@ function addCardsToArray(location) {
 			instanceId: globalCardIdCounter++,
 		}))
 	);
+
+	const extraWilds = Array.from({ length: additionalWilds }).map(() => ({
+		id: 13,
+		imagePath: './styles/img/card-w.png',
+		instanceId: globalCardIdCounter++,
+	}));
+	cards.push(...extraWilds);
 	location.push(...cards);
 	return cards;
 }
