@@ -4,6 +4,10 @@
 	--card-width: 85.9px;
 }
 
+html {
+	font-size: 16px;
+}
+
 main {
 	display: flex;
 	align-items: center;
@@ -14,7 +18,7 @@ main {
 	display: none;
 }
 
-button {
+#start-game {
 	height: 35px;
 }
 
@@ -83,12 +87,12 @@ button {
 .hand-zone,
 .discard-pile-zone,
 .discard-pile {
-	gap: 1rem;
+	gap: 0.5rem;
 }
 
 .game-board {
-	width: 90vw;
-	height: 90vh;
+	width: auto;
+	max-height: auto;
 	display: none;
 	grid-template-areas:
 		'player1 player1 player1'
@@ -143,13 +147,60 @@ button {
 .pl1 > .discard-pile-zone {
 	width: 100%;
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-areas:
+		'button0 button1 button2 button3'
+		'discard-pile0 discard-pile1 discard-pile2 discard-pile3';
+}
+
+.discard-button0 {
+	grid-area: button0;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.discard-button1 {
+	grid-area: button1;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.discard-button2 {
+	grid-area: button2;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.discard-button3 {
+	grid-area: button3;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.pl0 > .discard-pile-zone > .discard-pile.d0,
+.pl1 > .discard-pile-zone > .discard-pile.d0 {
+	grid-area: discard-pile0;
+}
+.pl0 > .discard-pile-zone > .discard-pile.d1,
+.pl1 > .discard-pile-zone > .discard-pile.d1 {
+	grid-area: discard-pile1;
+}
+.pl0 > .discard-pile-zone > .discard-pile.d2,
+.pl1 > .discard-pile-zone > .discard-pile.d2 {
+	grid-area: discard-pile2;
+}
+.pl0 > .discard-pile-zone > .discard-pile.d3,
+.pl1 > .discard-pile-zone > .discard-pile.d3 {
+	grid-area: discard-pile3;
 }
 
 .pl0 > .discard-pile-zone > .discard-pile,
 .pl1 > .discard-pile-zone > .discard-pile {
 	border: 1px solid black;
 	border-radius: 4px;
+}
+
+.pl0 > .stock-pile {
+	margin-top: auto;
 }
 
 .pl0 > .stock-pile,
@@ -175,7 +226,7 @@ button {
 		'hand hand hand';
 	grid-template-rows: 2fr 1fr;
 	grid-template-columns: 1fr 4fr 1fr;
-	gap: 1rem;
+	gap: 0.5rem;
 }
 
 .pl1 {
@@ -185,7 +236,7 @@ button {
 		'discard discard stock';
 	grid-template-rows: 1fr 2fr;
 	grid-template-columns: 1fr 4fr 1fr;
-	gap: 1rem;
+	gap: 0.5rem;
 }
 
 .pl0 > .discard-pile-zone,
@@ -234,12 +285,28 @@ button {
 	flex-wrap: nowrap;
 }
 
-.green {
+.pl1 .green {
 	background: green;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
 }
 
-.red {
+.pl1 .red {
 	background: red;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.pl0 .green {
+	background: green;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.pl0 .red {
+	background: red;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 }
 
 .selected > .card-inner {

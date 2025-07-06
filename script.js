@@ -36,6 +36,10 @@ const DOM = {
 	gameBoard: document.querySelector('.game-board'),
 	startGame: document.getElementById('start-game'),
 	mainMenu: document.querySelector('.main-menu'),
+	discardButton0: document.querySelector('.discard-button0'),
+	discardButton1: document.querySelector('.discard-button1'),
+	discardButton2: document.querySelector('.discard-button2'),
+	discardButton3: document.querySelector('.discard-button3'),
 };
 
 const gameState = {
