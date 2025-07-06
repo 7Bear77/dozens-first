@@ -56,7 +56,7 @@ function getPlayerZone(playerIndex) {
 	};
 }
 
-function createCard(cardItem) {
+function createCard(cardItem, options = {}) {
 	const cardElem = createElement('div');
 	const cardInnerElem = createElement('div');
 	const cardFrontElem = createElement('div');
@@ -83,6 +83,11 @@ function createCard(cardItem) {
 	addChildElement(cardInnerElem, cardFrontElem);
 	addChildElement(cardInnerElem, cardBackElem);
 	addChildElement(cardElem, cardInnerElem);
+
+	if (options.facedown) {
+		cardElem.querySelector('.card-inner').style.transform =
+			'rotateY(180deg)';
+	}
 
 	return cardElem;
 }
@@ -325,11 +330,15 @@ function renderPile(cards, container, options = {}) {
 	const offset = 20;
 
 	cards.forEach((card, i) => {
-		const cardEl = createCard(card, options);
+		const isTopCard = i === cards.length - 1;
+		const facedown = options.facedown && !isTopCard;
+		const cardEl = createCard(card, { ...options, facedown });
+
 		if (isDiscardPile) {
 			cardEl.style.top = `${i * offset}px`;
 			cardEl.style.zIndex = i;
 		}
+
 		container.appendChild(cardEl);
 	});
 }
@@ -344,7 +353,9 @@ function renderAllZones() {
 		const playerZone = getPlayerZone(playerIndex);
 		renderPile(player.hand, playerZone.handZone);
 		if (playerZone.stockZone) {
-			renderPile(player.stockPile, playerZone.stockZone);
+			renderPile(player.stockPile, playerZone.stockZone, {
+				facedown: true,
+			});
 		}
 		player.discardPiles.forEach((discardPile, dIndex) => {
 			renderPile(discardPile, playerZone.discardZones[dIndex]);
@@ -394,7 +405,6 @@ gameBoard.addEventListener('click', (event) => {
 	const cardEl = event.target.closest('.card');
 	const discardPileEl = event.target.closest('.discard-pile');
 	const playPileEl = event.target.closest('.play-pile');
-	const stockPileEl = event.target.closest('.stock-pile');
 	const playerZone = event.target.closest('[class^="pl"]');
 	let playerIndex = null;
 
@@ -405,11 +415,15 @@ gameBoard.addEventListener('click', (event) => {
 		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
 	}
 
+	if (selectedCard.cardEl) {
+		removeClassFromElement(selectedCard.cardEl, 'selected');
+	}
 	if (
 		cardEl &&
 		cardEl.closest('.hand-zone') &&
 		playerIndex === gameState.currentPlayerIndex
 	) {
+		addClassToElement(cardEl, 'selected');
 		const playerHand = gameState.players[playerIndex].hand;
 		const cardIndex = playerHand.findIndex(
 			(card) => card.id === Number(cardEl.id)
@@ -427,6 +441,8 @@ gameBoard.addEventListener('click', (event) => {
 		cardEl.closest('.stock-pile') &&
 		playerIndex === gameState.currentPlayerIndex
 	) {
+		addClassToElement(cardEl, 'selected');
+
 		const playerStockPile = gameState.players[playerIndex].stockPile;
 		const cardIndex = playerStockPile.length - 1;
 		selectedCard = {
@@ -442,6 +458,7 @@ gameBoard.addEventListener('click', (event) => {
 		cardEl.closest('.discard-pile') &&
 		playerIndex === gameState.currentPlayerIndex
 	) {
+		addClassToElement(cardEl, 'selected');
 		const discardPileEl = cardEl.closest('.discard-pile');
 		const discardClasses = Array.from(discardPileEl.classList);
 		const discardClass = discardClasses.find((cls) => /^d\d+$/.test(cls));
