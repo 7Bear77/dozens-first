@@ -9,15 +9,6 @@ main {
 	justify-content: center;
 }
 
-.control-buttons {
-	border: 1px solid black;
-	position: relative;
-	height: 90vh;
-	display: flex;
-	flex-direction: column;
-	width: 220px;
-}
-
 .hidden {
 	display: none;
 }
@@ -69,6 +60,15 @@ button {
 	transform: rotateY(180deg);
 }
 
+.main-menu {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+	width: 90vw;
+	height: 90vh;
+	align-items: center;
+}
+
 .game-board,
 .draw-pile,
 .play-piles-zone,
@@ -83,7 +83,7 @@ button {
 .game-board {
 	width: 90vw;
 	height: 90vh;
-	display: grid;
+	display: none;
 	grid-template-areas:
 		'player1 player1 player1'
 		'completed play draw'

@@ -32,6 +32,9 @@ const DOM = {
 	cardsToShuffle: document.querySelector('.to-be-shuffled'),
 	playPileText: document.querySelectorAll('.play-pile-text'),
 	hands: document.querySelectorAll('.hand-zone'),
+	gameBoard: document.querySelector('.game-board'),
+	startGame: document.getElementById('start-game'),
+	mainMenu: document.querySelector('.main-menu'),
 };
 
 const gameState = {
@@ -491,30 +494,8 @@ gameBoard.addEventListener('click', (event) => {
 	}
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-	document.querySelector('.start-game').addEventListener('click', () => {
-		startGame();
-	});
-	document.querySelector('.log-game-state').addEventListener('click', () => {
-		console.log(gameState);
-	});
-	document.querySelector('.play-card').addEventListener('click', () => {
-		playCard(
-			prompt('playerIndex'),
-			prompt('sourceType'),
-			prompt('cardSourceIndex'),
-			prompt('targetPileIndex')
-		);
-	});
-	document.querySelector('.discard-card').addEventListener('click', () => {
-		discardCard(gameState.currentPlayerIndex, 0, 0);
-	});
-	document.querySelector('.draw-cards').addEventListener('click', () => {
-		drawCards(gameState.currentPlayerIndex);
-	});
-	document.querySelector('.re-stock').addEventListener('click', () => {
-		reStock();
-	});
-	document.querySelector('.render').addEventListener('click', renderAllZones);
-	document.querySelector('.hide').addEventListener('click', hideFunctions);
+DOM.startGame.addEventListener('click', () => {
+	DOM.mainMenu.style.display = 'none';
+	DOM.gameBoard.style.display = 'grid';
+	startGame();
 });
