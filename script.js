@@ -158,11 +158,7 @@ function drawCards(player) {
 		let cardsDrawn = gameState.drawPile.splice(0, cardsToDraw);
 		gameState.players[player].hand.push(...cardsDrawn);
 		renderAllZones();
-		if (drawPile.length < maxHandSize) {
-			reStock();
-		} else {
-			return;
-		}
+		if (drawPile.length < maxHandSize) reStock();
 	} else {
 		console.log('error drawing cards');
 		renderAllZones();
@@ -369,6 +365,15 @@ function updateTopCardText(targetPileIndex) {
 	playPilesTextArray[targetPileIndex].innerHTML = `TOP CARD: ${pileLength}`;
 }
 
+function clearSelectedCard() {
+	selectedCard = {
+		playerIndex: null,
+		sourceType: null,
+		cardIndex: null,
+		cardEl: null,
+	};
+}
+
 const gameBoard = document.querySelector('.game-board');
 let selectedCard = {
 	playerIndex: null,
@@ -462,12 +467,7 @@ gameBoard.addEventListener('click', (event) => {
 				selectedCard.cardIndex,
 				discardIndex
 			);
-			selectedCard = {
-				playerIndex: null,
-				sourceType: null,
-				cardIndex: null,
-				cardEl: null,
-			};
+			clearSelectedCard();
 		}
 		return;
 	}
@@ -485,12 +485,7 @@ gameBoard.addEventListener('click', (event) => {
 			selectedCard.cardIndex,
 			playPileIndex
 		);
-		selectedCard = {
-			playerIndex: null,
-			sourceType: null,
-			cardIndex: null,
-			cardEl: null,
-		};
+		clearSelectedCard();
 	}
 });
 
