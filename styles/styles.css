@@ -104,6 +104,10 @@ main {
 	grid-template-columns: 15% 1fr 15%;
 }
 
+.pl1 .card {
+	transform: rotate(0.5turn);
+}
+
 .pl1 {
 	grid-area: player1;
 }
@@ -379,53 +383,53 @@ main {
 }
 
 .pl0 .hand-zone .card:nth-child(1) {
-	left: 40%;
+	left: 90%;
 	transform: rotate(-30deg);
 	transform-origin: 50% 100%;
 }
 .pl0 .hand-zone .card:nth-child(2) {
-	left: 40%;
+	left: 90%;
 	transform: rotate(-15deg);
 	transform-origin: 50% 100%;
 }
 .pl0 .hand-zone .card:nth-child(3) {
-	left: 40%;
+	left: 90%;
 	transform: rotate(0);
 	transform-origin: 50% 100%;
 }
 .pl0 .hand-zone .card:nth-child(4) {
-	left: 40%;
+	left: 90%;
 	transform: rotate(15deg);
 	transform-origin: 50% 100%;
 }
 .pl0 .hand-zone .card:nth-child(5) {
-	left: 40%;
+	left: 90%;
 	transform: rotate(30deg);
 	transform-origin: 50% 100%;
 }
 
 .pl1 .hand-zone .card:nth-child(1) {
-	left: 40%;
+	left: 85%;
 	transform: translateY(-55px) rotate(-30deg);
 	transform-origin: 50% 10%;
 }
 .pl1 .hand-zone .card:nth-child(2) {
-	left: 40%;
+	left: 85%;
 	transform: translateY(-55px) rotate(-15deg);
 	transform-origin: 50% 10%;
 }
 .pl1 .hand-zone .card:nth-child(3) {
-	left: 40%;
+	left: 85%;
 	transform: translateY(-55px) rotate(0);
 	transform-origin: 50% 10%;
 }
 .pl1 .hand-zone .card:nth-child(4) {
-	left: 40%;
+	left: 85%;
 	transform: translateY(-55px) rotate(15deg);
 	transform-origin: 50% 10%;
 }
 .pl1 .hand-zone .card:nth-child(5) {
-	left: 40%;
+	left: 85%;
 	transform: translateY(-55px) rotate(30deg);
 	transform-origin: 50% 10%;
 }
