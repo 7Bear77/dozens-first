@@ -36,10 +36,10 @@ const DOM = {
 	gameBoard: document.querySelector('.game-board'),
 	startGame: document.getElementById('start-game'),
 	mainMenu: document.querySelector('.main-menu'),
-	discardButton0: document.querySelector('.discard-button0'),
-	discardButton1: document.querySelector('.discard-button1'),
-	discardButton2: document.querySelector('.discard-button2'),
-	discardButton3: document.querySelector('.discard-button3'),
+	discardButton0: document.querySelectorAll('.discard-button0'),
+	discardButton1: document.querySelectorAll('.discard-button1'),
+	discardButton2: document.querySelectorAll('.discard-button2'),
+	discardButton3: document.querySelectorAll('.discard-button3'),
 };
 
 const gameState = {
@@ -529,3 +529,75 @@ DOM.startGame.addEventListener('click', () => {
 	DOM.gameBoard.style.display = 'grid';
 	startGame();
 });
+
+for (let i = 0; i < DOM.discardButton0.length; i++) {
+	DOM.discardButton0[i].addEventListener('click', () => {
+		const currentPlayerTurn = gameState.currentPlayerIndex;
+		const container = event.target;
+		const playerZone = container.closest('[class^="pl"]');
+		const plClass = Array.from(playerZone.classList).find((cls) =>
+			/^pl\d+$/.test(cls)
+		);
+		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
+		// const discardZone = container.closest('');
+		console.log(currentPlayerTurn);
+		console.log(playerIndex);
+		if (currentPlayerTurn === playerIndex) {
+			discardCard(playerIndex, selectedCard.cardIndex, 0);
+		}
+	});
+}
+
+for (let i = 0; i < DOM.discardButton1.length; i++) {
+	DOM.discardButton1[i].addEventListener('click', () => {
+		const currentPlayerTurn = gameState.currentPlayerIndex;
+		const container = event.target;
+		const playerZone = container.closest('[class^="pl"]');
+		const plClass = Array.from(playerZone.classList).find((cls) =>
+			/^pl\d+$/.test(cls)
+		);
+		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
+		// const discardZone = container.closest('');
+		console.log(currentPlayerTurn);
+		console.log(playerIndex);
+		if (currentPlayerTurn === playerIndex) {
+			discardCard(playerIndex, selectedCard.cardIndex, 1);
+		}
+	});
+}
+
+for (let i = 0; i < DOM.discardButton2.length; i++) {
+	DOM.discardButton2[i].addEventListener('click', () => {
+		const currentPlayerTurn = gameState.currentPlayerIndex;
+		const container = event.target;
+		const playerZone = container.closest('[class^="pl"]');
+		const plClass = Array.from(playerZone.classList).find((cls) =>
+			/^pl\d+$/.test(cls)
+		);
+		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
+		// const discardZone = container.closest('');
+		console.log(currentPlayerTurn);
+		console.log(playerIndex);
+		if (currentPlayerTurn === playerIndex) {
+			discardCard(playerIndex, selectedCard.cardIndex, 2);
+		}
+	});
+}
+
+for (let i = 0; i < DOM.discardButton3.length; i++) {
+	DOM.discardButton3[i].addEventListener('click', () => {
+		const currentPlayerTurn = gameState.currentPlayerIndex;
+		const container = event.target;
+		const playerZone = container.closest('[class^="pl"]');
+		const plClass = Array.from(playerZone.classList).find((cls) =>
+			/^pl\d+$/.test(cls)
+		);
+		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
+		// const discardZone = container.closest('');
+		console.log(currentPlayerTurn);
+		console.log(playerIndex);
+		if (currentPlayerTurn === playerIndex) {
+			discardCard(playerIndex, selectedCard.cardIndex, 3);
+		}
+	});
+}
