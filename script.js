@@ -532,72 +532,38 @@ DOM.startGame.addEventListener('click', () => {
 
 for (let i = 0; i < DOM.discardButton0.length; i++) {
 	DOM.discardButton0[i].addEventListener('click', () => {
-		const currentPlayerTurn = gameState.currentPlayerIndex;
-		const container = event.target;
-		const playerZone = container.closest('[class^="pl"]');
-		const plClass = Array.from(playerZone.classList).find((cls) =>
-			/^pl\d+$/.test(cls)
-		);
-		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
-		// const discardZone = container.closest('');
-		console.log(currentPlayerTurn);
-		console.log(playerIndex);
-		if (currentPlayerTurn === playerIndex) {
+		if (gameState.currentPlayerIndex === extractClass(event)) {
 			discardCard(playerIndex, selectedCard.cardIndex, 0);
 		}
 	});
 }
-
 for (let i = 0; i < DOM.discardButton1.length; i++) {
 	DOM.discardButton1[i].addEventListener('click', () => {
-		const currentPlayerTurn = gameState.currentPlayerIndex;
-		const container = event.target;
-		const playerZone = container.closest('[class^="pl"]');
-		const plClass = Array.from(playerZone.classList).find((cls) =>
-			/^pl\d+$/.test(cls)
-		);
-		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
-		// const discardZone = container.closest('');
-		console.log(currentPlayerTurn);
-		console.log(playerIndex);
-		if (currentPlayerTurn === playerIndex) {
+		if (gameState.currentPlayerIndex === extractClass(event)) {
 			discardCard(playerIndex, selectedCard.cardIndex, 1);
 		}
 	});
 }
-
 for (let i = 0; i < DOM.discardButton2.length; i++) {
 	DOM.discardButton2[i].addEventListener('click', () => {
-		const currentPlayerTurn = gameState.currentPlayerIndex;
-		const container = event.target;
-		const playerZone = container.closest('[class^="pl"]');
-		const plClass = Array.from(playerZone.classList).find((cls) =>
-			/^pl\d+$/.test(cls)
-		);
-		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
-		// const discardZone = container.closest('');
-		console.log(currentPlayerTurn);
-		console.log(playerIndex);
-		if (currentPlayerTurn === playerIndex) {
+		if (gameState.currentPlayerIndex === extractClass(event)) {
 			discardCard(playerIndex, selectedCard.cardIndex, 2);
 		}
 	});
 }
-
 for (let i = 0; i < DOM.discardButton3.length; i++) {
 	DOM.discardButton3[i].addEventListener('click', () => {
-		const currentPlayerTurn = gameState.currentPlayerIndex;
-		const container = event.target;
-		const playerZone = container.closest('[class^="pl"]');
-		const plClass = Array.from(playerZone.classList).find((cls) =>
-			/^pl\d+$/.test(cls)
-		);
-		playerIndex = plClass ? Number(plClass.replace('pl', '')) : null;
-		// const discardZone = container.closest('');
-		console.log(currentPlayerTurn);
-		console.log(playerIndex);
-		if (currentPlayerTurn === playerIndex) {
+		if (gameState.currentPlayerIndex === extractClass(event)) {
 			discardCard(playerIndex, selectedCard.cardIndex, 3);
 		}
 	});
+}
+
+function extractClass(event) {
+	const container = event.target;
+	const playerZone = container.closest('[class^="pl"]');
+	const plClass = Array.from(playerZone.classList).find((cls) =>
+		/^pl\d+$/.test(cls)
+	);
+	return (playerIndex = plClass ? Number(plClass.replace('pl', '')) : null);
 }
