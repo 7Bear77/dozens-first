@@ -331,15 +331,21 @@ function addCardsToArray(location) {
 function renderPile(cards, container, options = {}) {
 	container.innerHTML = '';
 	const isDiscardPile = container.classList.contains('discard-pile');
-	const offset = 20;
+	const isPl0 = container.closest('.pl0');
+	console.log(isPl0);
+	const pl0Offset = 20;
+	const pl1Offset = -30;
 
 	cards.forEach((card, i) => {
 		const isTopCard = i === cards.length - 1;
 		const facedown = options.facedown && !isTopCard;
 		const cardEl = createCard(card, { ...options, facedown });
 
-		if (isDiscardPile) {
-			cardEl.style.top = `${i * offset}px`;
+		if (isDiscardPile && isPl0) {
+			cardEl.style.top = `${i * pl0Offset}px`;
+			cardEl.style.zIndex = i;
+		} else if (isDiscardPile) {
+			cardEl.style.top = `${i * pl1Offset}px`;
 			cardEl.style.zIndex = i;
 		}
 

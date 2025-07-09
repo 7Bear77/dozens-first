@@ -100,7 +100,7 @@ main {
 		'player0 player0 player0';
 	border: 3px solid black;
 	border-radius: 8px;
-	grid-template-rows: 4fr 3fr 4fr;
+	grid-template-rows: 4fr auto 4fr;
 	grid-template-columns: 15% 1fr 15%;
 }
 
@@ -143,54 +143,98 @@ main {
 	width: 20%;
 }
 
-.pl0 > .discard-pile-zone,
+.pl1 > .discard-pile {
+	transform: rotateY(180deg);
+	background-color: aqua;
+}
+
+.pl0 > .discard-pile-zone {
+	width: 100%;
+	display: grid;
+	grid-template-areas:
+		'pl0button0 pl0button1 pl0button2 pl0button3'
+		'pl0discard-pile0 pl0discard-pile1 pl0discard-pile2 pl0discard-pile3';
+}
+
 .pl1 > .discard-pile-zone {
 	width: 100%;
 	display: grid;
 	grid-template-areas:
-		'button0 button1 button2 button3'
-		'discard-pile0 discard-pile1 discard-pile2 discard-pile3';
+		'pl1discard-pile0 pl1discard-pile1 pl1discard-pile2 pl1discard-pile3'
+		'pl1button0 pl1button1 pl1button2 pl1button3';
 }
 
-.discard-button0 {
-	grid-area: button0;
+.pl0 > .discard-button0 {
+	grid-area: pl0button0;
 	height: 1rem;
 	font-size: 0.7rem;
 	width: calc(var(--card-width) + 4px);
 }
-.discard-button1 {
-	grid-area: button1;
+.pl0 > .discard-button1 {
+	grid-area: pl0button1;
 	height: 1rem;
 	font-size: 0.7rem;
 	width: calc(var(--card-width) + 4px);
 }
-.discard-button2 {
-	grid-area: button2;
+.pl0 > .discard-button2 {
+	grid-area: pl0button2;
 	height: 1rem;
 	font-size: 0.7rem;
 	width: calc(var(--card-width) + 4px);
 }
-.discard-button3 {
-	grid-area: button3;
+.pl0 > .discard-button3 {
+	grid-area: pl0button3;
 	height: 1rem;
 	font-size: 0.7rem;
 	width: calc(var(--card-width) + 4px);
 }
-.pl0 > .discard-pile-zone > .discard-pile.d0,
+.pl1 > .discard-button0 {
+	grid-area: pl1button0;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.pl1 > .discard-button1 {
+	grid-area: pl1button1;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.pl1 > .discard-button2 {
+	grid-area: pl1button2;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.pl1 > .discard-button3 {
+	grid-area: pl1button3;
+	height: 1rem;
+	font-size: 0.7rem;
+	width: calc(var(--card-width) + 4px);
+}
+.pl0 > .discard-pile-zone > .discard-pile.d0 {
+	grid-area: pl0discard-pile0;
+}
+.pl0 > .discard-pile-zone > .discard-pile.d1 {
+	grid-area: pl0discard-pile1;
+}
+.pl0 > .discard-pile-zone > .discard-pile.d2 {
+	grid-area: pl0discard-pile2;
+}
+.pl0 > .discard-pile-zone > .discard-pile.d3 {
+	grid-area: pl0discard-pile3;
+}
 .pl1 > .discard-pile-zone > .discard-pile.d0 {
-	grid-area: discard-pile0;
+	grid-area: pl1discard-pile0;
 }
-.pl0 > .discard-pile-zone > .discard-pile.d1,
 .pl1 > .discard-pile-zone > .discard-pile.d1 {
-	grid-area: discard-pile1;
+	grid-area: pl1discard-pile1;
 }
-.pl0 > .discard-pile-zone > .discard-pile.d2,
 .pl1 > .discard-pile-zone > .discard-pile.d2 {
-	grid-area: discard-pile2;
+	grid-area: pl1discard-pile2;
 }
-.pl0 > .discard-pile-zone > .discard-pile.d3,
 .pl1 > .discard-pile-zone > .discard-pile.d3 {
-	grid-area: discard-pile3;
+	grid-area: pl1discard-pile3;
 }
 
 .pl0 > .discard-pile-zone > .discard-pile,
@@ -217,6 +261,10 @@ main {
 	flex-wrap: wrap;
 	position: relative;
 	z-index: 100;
+}
+
+.hand-zone .card {
+	z-index: 1000;
 }
 
 .pl0 {
@@ -277,7 +325,7 @@ main {
 	border: 2px solid black;
 	border-radius: 4px;
 	width: 95%;
-	height: 20%;
+	height: auto;
 	font-size: 0.75rem;
 	text-align: center;
 	display: flex;
