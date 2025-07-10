@@ -257,7 +257,7 @@ function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 		}
 	} else {
 		console.log('Invalid Move');
-		return;
+		return false;
 	}
 	renderAllZones();
 }
@@ -332,7 +332,6 @@ function renderPile(cards, container, options = {}) {
 	container.innerHTML = '';
 	const isDiscardPile = container.classList.contains('discard-pile');
 	const isPl0 = container.closest('.pl0');
-	console.log(isPl0);
 	const pl0Offset = 20;
 	const pl1Offset = -30;
 
@@ -444,7 +443,6 @@ gameBoard.addEventListener('click', (event) => {
 			cardIndex,
 			cardEl,
 		};
-		console.log('Card selected from hand:', selectedCard);
 		return;
 	} else if (
 		cardEl &&
@@ -566,4 +564,52 @@ function extractClass(event) {
 		/^pl\d+$/.test(cls)
 	);
 	return (playerIndex = plClass ? Number(plClass.replace('pl', '')) : null);
+}
+
+// function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
+function canPlayCard() {
+	const playerIndex = gameState.currentPlayerIndex;
+	const player = gameState.players[playerIndex];
+	const playerHand = player.hand;
+	const buildPiles = gameState.buildPiles;
+	const playerStock = player.stockPile;
+	const stockLengthIndex = playerStock.length - 1;
+	const playerDiscards = player.discardPiles;
+	let playableCards = [];
+
+	for (let pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
+		if (isValidMove(playerStock[stockLengthIndex], buildPiles[pileIdx])) {
+			playableCards.push({ pileIdx, type: 'stock' });
+		} else console.log('no play from stock');
+
+		for (let cardIdx = 0; cardIdx < playerHand.length; cardIdx++) {
+			for (pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
+				if (isValidMove(playerHand[cardIdx], buildPiles[pileIdx])) {
+					playableCards.push({ pileIdx, type: 'hand', cardIdx });
+				} else console.log('no play from hand');
+			}
+		}
+
+		for (let pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
+			for (
+				let discardIdx = 0;
+				discardIdx < playerDiscards.length;
+				discardIdx++
+			) {
+				const discardPile = playerDiscards[discardIdx];
+				const topDiscardCard = discardPile[discardPile.length - 1];
+				if (
+					topDiscardCard &&
+					isValidMove(topDiscardCard, buildPiles[pileIdx])
+				) {
+					playableCards.push({
+						pileIdx,
+						type: 'discard',
+						discardIdx,
+					});
+				} else console.log('no play from discard');
+			}
+		}
+	}
+	console.log(playableCards);
 }
