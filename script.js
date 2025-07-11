@@ -373,7 +373,7 @@ function renderAllZones() {
 }
 
 function determineWinner(playerIndex) {
-	const player = gameState.players[playerIndex];
+	const player = gameState.players[gameState.currentPlayerIndex];
 	if (player.stockPile.length === 0) {
 		console.log('you win the game');
 	} else {
@@ -483,7 +483,6 @@ gameBoard.addEventListener('click', (event) => {
 		return;
 	}
 
-	// discard card function
 	if (
 		discardPileEl &&
 		selectedCard.cardEl &&
@@ -505,7 +504,6 @@ gameBoard.addEventListener('click', (event) => {
 		return;
 	}
 
-	// play card function
 	if (playPileEl && selectedCard.cardEl) {
 		const playPileClasses = Array.from(playPileEl.classList);
 		const playPileClass = playPileClasses.find((cls) => /^p\d+$/.test(cls));
@@ -566,8 +564,10 @@ function extractClass(event) {
 	return (playerIndex = plClass ? Number(plClass.replace('pl', '')) : null);
 }
 
+let playableCards = [];
 // function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 function canPlayCard() {
+	playableCards = [];
 	const playerIndex = gameState.currentPlayerIndex;
 	const player = gameState.players[playerIndex];
 	const playerHand = player.hand;
@@ -575,7 +575,6 @@ function canPlayCard() {
 	const playerStock = player.stockPile;
 	const stockLengthIndex = playerStock.length - 1;
 	const playerDiscards = player.discardPiles;
-	let playableCards = [];
 
 	for (let pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
 		if (isValidMove(playerStock[stockLengthIndex], buildPiles[pileIdx])) {
@@ -583,33 +582,48 @@ function canPlayCard() {
 		} else console.log('no play from stock');
 
 		for (let cardIdx = 0; cardIdx < playerHand.length; cardIdx++) {
-			for (pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
-				if (isValidMove(playerHand[cardIdx], buildPiles[pileIdx])) {
-					playableCards.push({ pileIdx, type: 'hand', cardIdx });
-				} else console.log('no play from hand');
-			}
+			if (isValidMove(playerHand[cardIdx], buildPiles[pileIdx])) {
+				playableCards.push({ pileIdx, type: 'hand', cardIdx });
+			} else console.log('no play from hand');
 		}
 
-		for (let pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
-			for (
-				let discardIdx = 0;
-				discardIdx < playerDiscards.length;
-				discardIdx++
+		for (
+			let discardIdx = 0;
+			discardIdx < playerDiscards.length;
+			discardIdx++
+		) {
+			const discardPile = playerDiscards[discardIdx];
+			const topDiscardCard = discardPile[discardPile.length - 1];
+			if (
+				topDiscardCard &&
+				isValidMove(topDiscardCard, buildPiles[pileIdx])
 			) {
-				const discardPile = playerDiscards[discardIdx];
-				const topDiscardCard = discardPile[discardPile.length - 1];
-				if (
-					topDiscardCard &&
-					isValidMove(topDiscardCard, buildPiles[pileIdx])
-				) {
-					playableCards.push({
-						pileIdx,
-						type: 'discard',
-						discardIdx,
-					});
-				} else console.log('no play from discard');
-			}
+				playableCards.push({
+					pileIdx,
+					type: 'discard',
+					discardIdx,
+				});
+			} else console.log('no play from discard');
 		}
 	}
 	console.log(playableCards);
+}
+
+function computerTurn() {
+	const playableStock = playableCards.filter((item) => item.type === 'stock');
+	const playableHand = playableCards.filter((item) => item.type === 'hand');
+	const playbleDiscard = playableCards.filter(
+		(item) => item.type === 'discard'
+	);
+	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+	const playerStock = currentPlayer.stockPile;
+	const stockLengthIndex = playerStock.length - 1;
+	if (playableClone[0].type === 'stock') {
+		playCard(
+			currentPlayer,
+			'stock',
+			stockLengthIndex,
+			playableStock[0].pileIdx
+		);
+	}
 }
