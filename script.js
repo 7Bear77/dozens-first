@@ -632,14 +632,8 @@ function computerTurn() {
 	const discardIndex = currentPlayer.hand.findIndex(
 		(item) => item.id === largestCard
 	);
-	console.log(discardIndex);
 	if (canPlayStock !== -1) {
-		playCard(
-			currentPlayer,
-			'stock',
-			stockIndex,
-			gameState.buildPiles[playableCards[canPlayStock].pileIndex]
-		);
+		playCard(currentPlayer, 'stock', stockIndex, canPlayStock);
 	} else if (canPlayHand[0]) {
 		playCard(
 			currentPlayer,
@@ -651,10 +645,18 @@ function computerTurn() {
 		playCard(
 			currentPlayer,
 			'discard',
-			canPlayDiscard[0].cardIndex,
+			canPlayDiscard[0].discardIndex,
 			playableCards[0].pileIndex
 		);
 	} else {
 		discardCard(gameState.currentPlayerIndex, discardIndex, 0);
 	}
 }
+
+document
+	.querySelector('.canplay')
+	.addEventListener('click', computerCanPlayCard);
+
+document.querySelector('.compturn').addEventListener('click', computerTurn);
+
+// You can verify this by setting a breakpoint on line 205 of script.js in the Chrome DevTools Sources panel. When the debugger pauses on this line, hover over the buildPile variable to see its value. If it shows undefined, then this is the source of the problem. You can then inspect the call stack to see where isValidMove is being called with undefined as the second argument.
