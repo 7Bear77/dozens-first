@@ -2,6 +2,7 @@ console.log('dozens of hours of fun');
 
 // library of the cards we want to generate
 const cardObjectDefinitions = [
+	{ id: 0, imagePath: './styles/img/card-w.png' },
 	{ id: 1, imagePath: './styles/img/card-1.png' },
 	{ id: 2, imagePath: './styles/img/card-2.png' },
 	{ id: 3, imagePath: './styles/img/card-3.png' },
@@ -14,8 +15,9 @@ const cardObjectDefinitions = [
 	{ id: 10, imagePath: './styles/img/card-10.png' },
 	{ id: 11, imagePath: './styles/img/card-11.png' },
 	{ id: 12, imagePath: './styles/img/card-12.png' },
-	{ id: 13, imagePath: './styles/img/card-w.png' },
 ];
+
+let isComputerTurn = false;
 
 const cardBackImgPath = './styles/img/card-back.png';
 
@@ -201,7 +203,7 @@ function updateCurrentPlayerIndicator() {
 
 function isValidMove(card, buildPile) {
 	const nextRequiredCard = buildPile.length + 1;
-	return card.id === nextRequiredCard || card.id === 13;
+	return card.id === nextRequiredCard || card.id === 0;
 }
 
 function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
@@ -319,7 +321,7 @@ function addCardsToArray(location) {
 	);
 
 	const extraWilds = Array.from({ length: additionalWilds }).map(() => ({
-		id: 13,
+		id: 0,
 		imagePath: './styles/img/card-w.png',
 		instanceId: globalCardIdCounter++,
 	}));
@@ -565,8 +567,8 @@ function extractClass(event) {
 }
 
 let playableCards = [];
-// function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
-function canPlayCard() {
+
+function computerCanPlayCard() {
 	playableCards = [];
 	const playerIndex = gameState.currentPlayerIndex;
 	const player = gameState.players[playerIndex];
@@ -576,32 +578,32 @@ function canPlayCard() {
 	const stockLengthIndex = playerStock.length - 1;
 	const playerDiscards = player.discardPiles;
 
-	for (let pileIdx = 0; pileIdx < buildPiles.length; pileIdx++) {
-		if (isValidMove(playerStock[stockLengthIndex], buildPiles[pileIdx])) {
-			playableCards.push({ pileIdx, type: 'stock' });
+	for (let pileIndex = 0; pileIndex < buildPiles.length; pileIndex++) {
+		if (isValidMove(playerStock[stockLengthIndex], buildPiles[pileIndex])) {
+			playableCards.push({ pileIndex, type: 'stock' });
 		} else console.log('no play from stock');
 
-		for (let cardIdx = 0; cardIdx < playerHand.length; cardIdx++) {
-			if (isValidMove(playerHand[cardIdx], buildPiles[pileIdx])) {
-				playableCards.push({ pileIdx, type: 'hand', cardIdx });
+		for (let cardIndex = 0; cardIndex < playerHand.length; cardIndex++) {
+			if (isValidMove(playerHand[cardIndex], buildPiles[pileIndex])) {
+				playableCards.push({ pileIndex, type: 'hand', cardIndex });
 			} else console.log('no play from hand');
 		}
 
 		for (
-			let discardIdx = 0;
-			discardIdx < playerDiscards.length;
-			discardIdx++
+			let discardIndex = 0;
+			discardIndex < playerDiscards.length;
+			discardIndex++
 		) {
-			const discardPile = playerDiscards[discardIdx];
+			const discardPile = playerDiscards[discardIndex];
 			const topDiscardCard = discardPile[discardPile.length - 1];
 			if (
 				topDiscardCard &&
-				isValidMove(topDiscardCard, buildPiles[pileIdx])
+				isValidMove(topDiscardCard, buildPiles[pileIndex])
 			) {
 				playableCards.push({
-					pileIdx,
+					pileIndex,
 					type: 'discard',
-					discardIdx,
+					discardIndex,
 				});
 			} else console.log('no play from discard');
 		}
@@ -609,21 +611,50 @@ function canPlayCard() {
 	console.log(playableCards);
 }
 
+// function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
 function computerTurn() {
-	const playableStock = playableCards.filter((item) => item.type === 'stock');
-	const playableHand = playableCards.filter((item) => item.type === 'hand');
-	const playbleDiscard = playableCards.filter(
-		(item) => item.type === 'discard'
-	);
 	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-	const playerStock = currentPlayer.stockPile;
-	const stockLengthIndex = playerStock.length - 1;
-	if (playableClone[0].type === 'stock') {
+	const canPlayStock = playableCards.findIndex(
+		(stockCard) => stockCard.type == 'stock'
+	);
+	const canPlayHand = playableCards.filter((card) => card.type === 'hand');
+	const canPlayDiscard = playableCards.filter(
+		(card) => card.type === 'discard'
+	);
+	const stockIndex = currentPlayer.stockPile.length - 1;
+	let largestCard = 0;
+	const ids = currentPlayer.hand.map((card) => card.id);
+	ids.forEach((id) => {
+		if (id > largestCard) {
+			largestCard = id;
+		}
+	});
+	const discardIndex = currentPlayer.hand.findIndex(
+		(item) => item.id === largestCard
+	);
+	console.log(discardIndex);
+	if (canPlayStock !== -1) {
 		playCard(
 			currentPlayer,
 			'stock',
-			stockLengthIndex,
-			playableStock[0].pileIdx
+			stockIndex,
+			gameState.buildPiles[playableCards[canPlayStock].pileIndex]
 		);
+	} else if (canPlayHand[0]) {
+		playCard(
+			currentPlayer,
+			'hand',
+			canPlayHand[0].cardIndex,
+			playableCards[0].pileIndex
+		);
+	} else if (canPlayDiscard[0]) {
+		playCard(
+			currentPlayer,
+			'discard',
+			canPlayDiscard[0].cardIndex,
+			playableCards[0].pileIndex
+		);
+	} else {
+		discardCard(gameState.currentPlayerIndex, discardIndex, 0);
 	}
 }
