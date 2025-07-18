@@ -433,3 +433,8 @@ main {
 	transform: translateY(-55px) rotate(30deg);
 	transform-origin: 50% 10%;
 }
+
+.buttons {
+	display: flex;
+	flex-direction: column;
+}

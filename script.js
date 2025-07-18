@@ -653,10 +653,56 @@ function computerTurn() {
 	}
 }
 
+function determineDiscardCard() {
+	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+	const playerHand = currentPlayer.hand;
+	const playerDiscards = currentPlayer.discardPiles;
+	const playerStock = currentPlayer.stockPile;
+	const stockCard = playerStock[playerStock.length - 1];
+
+	let chosenCardId;
+	const discardMatches = [];
+	const lastOfDiscards = [];
+	const playerHandId = playerHand.map((card) => card.id);
+
+	playerDiscards.forEach((pile) => {
+		if (pile.length > 0) {
+			lastOfDiscards.push(pile[pile.length - 1]);
+		} else {
+			lastOfDiscards.push([]);
+		}
+	});
+
+	const discardsIds = lastOfDiscards.map((card) =>
+		card ? card.id : undefined
+	);
+
+	playerHand.forEach((card) => {
+		if (playerHand.length === 1) {
+			chosenCardId = card.id;
+		} else if (card.id === stockCard.id) {
+			chosenCardId = card.id;
+		} else if (discardsIds.includes(card.id)) {
+			discardMatches.push(card.id);
+			chosenCardId = Math.max(...discardMatches);
+		} else {
+			chosenCardId = Math.max(...playerHandId);
+		}
+	});
+
+	const chosenCardIndex = playerHand.findIndex(
+		(card) => card.id === chosenCardId
+	);
+
+	let chosenDiscardIndex;
+	// upond return work out chosen discard index
+}
+
 document
 	.querySelector('.canplay')
 	.addEventListener('click', computerCanPlayCard);
 
 document.querySelector('.compturn').addEventListener('click', computerTurn);
-
-// You can verify this by setting a breakpoint on line 205 of script.js in the Chrome DevTools Sources panel. When the debugger pauses on this line, hover over the buildPile variable to see its value. If it shows undefined, then this is the source of the problem. You can then inspect the call stack to see where isValidMove is being called with undefined as the second argument.
+document
+	.querySelector('.discard')
+	.addEventListener('click', determineDiscardCard);
