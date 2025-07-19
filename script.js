@@ -655,12 +655,12 @@ function computerTurn() {
 
 function determineDiscardCard() {
 	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+	const playerIndex = gameState.currentPlayerIndex;
 	const playerHand = currentPlayer.hand;
 	const playerDiscards = currentPlayer.discardPiles;
 	const playerStock = currentPlayer.stockPile;
 	const stockCard = playerStock[playerStock.length - 1];
 
-	let chosenCardId;
 	const discardMatches = [];
 	const lastOfDiscards = [];
 	const playerHandId = playerHand.map((card) => card.id);
@@ -677,25 +677,55 @@ function determineDiscardCard() {
 		card ? card.id : undefined
 	);
 
-	playerHand.forEach((card) => {
-		if (playerHand.length === 1) {
-			chosenCardId = card.id;
-		} else if (card.id === stockCard.id) {
-			chosenCardId = card.id;
-		} else if (discardsIds.includes(card.id)) {
-			discardMatches.push(card.id);
-			chosenCardId = Math.max(...discardMatches);
-		} else {
-			chosenCardId = Math.max(...playerHandId);
-		}
-	});
+	let chosenCardId =
+		playerHand.length === 1
+			? playerHand[0].id
+			: playerHand.find((card) => card.id === stockCard.id)?.id ||
+			  playerHand.find((card) => discardsIds.includes(card.id))?.id ||
+			  Math.max(...playerHandId);
 
 	const chosenCardIndex = playerHand.findIndex(
 		(card) => card.id === chosenCardId
 	);
 
 	let chosenDiscardIndex;
-	// upond return work out chosen discard index
+
+	const largerCardsThanChosen = discardsIds.filter((id) => id > chosenCardId);
+	const smallerCardsThanChosen = discardsIds.filter(
+		(id) => id < chosenCardId
+	);
+
+	if (discardsIds.includes(chosenCardId)) {
+		chosenDiscardIndex = discardsIds.findIndex(
+			(pile) => pile === chosenCardId
+		);
+	} else if (discardsIds.includes(undefined)) {
+		chosenDiscardIndex = discardsIds.findIndex(
+			(pile) => pile === undefined
+		);
+	} else if (discardsIds.includes(stockCard.id)) {
+		chosenDiscardIndex = discardsIds.findIndex(
+			(pile) => pile === stockCard.id
+		);
+	} else if (discardsIds.includes(chosenCardId + 1)) {
+		chosenDiscardIndex = discardsIds.findIndex(
+			(pile) => pile === chosenCardId + 1
+		);
+	} else if (largerCardsThanChosen.length > 0) {
+		const largestDiscardId = Math.max(...largerCardsThanChosen);
+		chosenDiscardIndex = discardsIds.findIndex(
+			(id) => id === largestDiscardId
+		);
+	} else if (smallerCardsThanChosen.length > 0) {
+		const smallestDiscardId = Math.min(...smallerCardsThanChosen);
+		chosenDiscardIndex = discardsIds.findIndex(
+			(id) => id === smallestDiscardId
+		);
+	} else {
+		chosenDiscardIndex = Math.floor(Math.random * discardsIds.length - 1);
+	}
+
+	discardCard(playerIndex, chosenCardIndex, chosenDiscardIndex);
 }
 
 document
