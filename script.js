@@ -461,7 +461,6 @@ gameBoard.addEventListener('click', (event) => {
 			cardIndex,
 			cardEl,
 		};
-		console.log('Card selected from stock pile:', selectedCard);
 		return;
 	} else if (
 		cardEl &&
@@ -481,7 +480,6 @@ gameBoard.addEventListener('click', (event) => {
 			cardIndex: discardPileIndex,
 			cardEl,
 		};
-		console.log('Card selected from discard pile:', selectedCard);
 		return;
 	}
 
@@ -568,7 +566,7 @@ function extractClass(event) {
 
 let playableCards = [];
 
-function computerCanPlayCard() {
+function computerCanPlayCard(gameVersion) {
 	playableCards = [];
 	const playerIndex = gameState.currentPlayerIndex;
 	const player = gameState.players[playerIndex];
@@ -580,13 +578,21 @@ function computerCanPlayCard() {
 
 	for (let pileIndex = 0; pileIndex < buildPiles.length; pileIndex++) {
 		if (isValidMove(playerStock[stockLengthIndex], buildPiles[pileIndex])) {
-			playableCards.push({ pileIndex, type: 'stock' });
-		} else console.log('no play from stock');
-
+			playableCards.push({
+				cardId: playerStock[stockLengthIndex].id,
+				pileIndex,
+				type: 'stock',
+			});
+		}
 		for (let cardIndex = 0; cardIndex < playerHand.length; cardIndex++) {
 			if (isValidMove(playerHand[cardIndex], buildPiles[pileIndex])) {
-				playableCards.push({ pileIndex, type: 'hand', cardIndex });
-			} else console.log('no play from hand');
+				playableCards.push({
+					cardId: playerHand[cardIndex].id,
+					pileIndex,
+					type: 'hand',
+					cardIndex,
+				});
+			}
 		}
 
 		for (
@@ -601,14 +607,107 @@ function computerCanPlayCard() {
 				isValidMove(topDiscardCard, buildPiles[pileIndex])
 			) {
 				playableCards.push({
+					cardId: topDiscardCard.id,
 					pileIndex,
 					type: 'discard',
 					discardIndex,
 				});
-			} else console.log('no play from discard');
+			}
 		}
 	}
 	console.log(playableCards);
+	computerTurn();
+}
+
+// isValidMove(card, buildPile)
+function canReachStock() {
+	let gameStateCopy = gameState;
+	let stockReached = false;
+	const playerIndex = gameState.currentPlayerIndex;
+	const player = gameState.players[playerIndex];
+	const playerHand = player.hand;
+	const buildPiles = gameState.buildPiles;
+	const playerStock = player.stockPile;
+	const stockLengthIndex = playerStock.length - 1;
+
+	const topCardofPile = [];
+	const stockCard = playerStock[stockLengthIndex];
+
+	for (let i = 0; i < gameState.buildPiles.length; i++) {
+		topCardofPile.push(gameState.buildPiles[i].length);
+	}
+
+	const cardsToReach = [];
+
+	for (let i = 0; i < topCardofPile.length; i++) {
+		if (stockCard.id > topCardofPile[i]) {
+			let difference = stockCard.id - topCardofPile[i];
+			cardsToReach.push({
+				difference: difference - 1,
+				index: i,
+				bigger: true,
+			});
+		} else {
+			let difference = stockCard.id + (12 - topCardofPile[i]);
+			cardsToReach.push({
+				difference: difference - 1,
+				index: i,
+				bigger: false,
+			});
+		}
+	}
+	console.log(cardsToReach);
+	let easiestIndexToReach;
+	let smallNum = 12;
+	for (let i = 0; i < cardsToReach.length; i++) {
+		if (cardsToReach[i].difference < smallNum) {
+			smallNum = cardsToReach[i].difference;
+			easiestIndexToReach = i;
+		}
+	}
+
+	const cardsNeededToPlayStock = [];
+
+	if (stockCard.id !== 0) {
+		if (cardsToReach[easiestIndexToReach].bigger === true) {
+			for (
+				let j = stockCard.id - 1;
+				j > topCardofPile[easiestIndexToReach];
+				j--
+			) {
+				cardsNeededToPlayStock.push({
+					id: j,
+					index: cardsToReach[easiestIndexToReach].index,
+				});
+			}
+		} else {
+			for (
+				let j = topCardofPile[easiestIndexToReach] + 1;
+				j !== stockCard.id;
+				j++
+			) {
+				if (j === 13) {
+					j = 1;
+				}
+				cardsNeededToPlayStock.push({
+					id: j,
+					index: cardsToReach[easiestIndexToReach].index,
+				});
+			}
+		}
+	}
+
+	console.log(cardsNeededToPlayStock);
+
+	let COPY = {
+		player: gameStateCopy.players[gameStateCopy.currentPlayerIndex],
+		playerIndex: gameStateCopy.currentPlayerIndex,
+		playableCards: computerCanPlayCard,
+		topStock:
+			gameStateCopy.players[gameStateCopy.currentPlayerIndex].stockPile
+				.length - 1,
+	};
+	playableTypes = playableCards.map((card) => card.type);
 }
 
 // function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
@@ -633,23 +732,28 @@ function computerTurn() {
 		(item) => item.id === largestCard
 	);
 	if (canPlayStock !== -1) {
-		playCard(currentPlayer, 'stock', stockIndex, canPlayStock);
+		playCard(
+			currentPlayer,
+			'stock',
+			stockIndex,
+			playableCards[canPlayStock].pileIndex
+		);
 	} else if (canPlayHand[0]) {
 		playCard(
 			currentPlayer,
 			'hand',
 			canPlayHand[0].cardIndex,
-			playableCards[0].pileIndex
+			canPlayHand[0].pileIndex
 		);
 	} else if (canPlayDiscard[0]) {
 		playCard(
 			currentPlayer,
 			'discard',
 			canPlayDiscard[0].discardIndex,
-			playableCards[0].pileIndex
+			canPlayDiscard[0].pileIndex
 		);
 	} else {
-		discardCard(gameState.currentPlayerIndex, discardIndex, 0);
+		determineDiscardCard();
 	}
 }
 
@@ -690,6 +794,7 @@ function determineDiscardCard() {
 
 	let chosenDiscardIndex;
 
+	const nextHighest = chosenCardId + 1;
 	const largerCardsThanChosen = discardsIds.filter((id) => id > chosenCardId);
 	const smallerCardsThanChosen = discardsIds.filter(
 		(id) => id < chosenCardId
@@ -699,28 +804,34 @@ function determineDiscardCard() {
 		chosenDiscardIndex = discardsIds.findIndex(
 			(pile) => pile === chosenCardId
 		);
+		console.log('discarded because match');
 	} else if (discardsIds.includes(undefined)) {
 		chosenDiscardIndex = discardsIds.findIndex(
 			(pile) => pile === undefined
 		);
+		console.log('discarded because empty pile');
 	} else if (discardsIds.includes(stockCard.id)) {
 		chosenDiscardIndex = discardsIds.findIndex(
 			(pile) => pile === stockCard.id
 		);
-	} else if (discardsIds.includes(chosenCardId + 1)) {
+		console.log('discarded because matches stockpile');
+	} else if (discardsIds.includes(nextHighest)) {
 		chosenDiscardIndex = discardsIds.findIndex(
-			(pile) => pile === chosenCardId + 1
+			(pile) => pile === nextHighest
 		);
+		console.log('discarded because next sequential');
 	} else if (largerCardsThanChosen.length > 0) {
 		const largestDiscardId = Math.max(...largerCardsThanChosen);
 		chosenDiscardIndex = discardsIds.findIndex(
 			(id) => id === largestDiscardId
 		);
+		console.log('discarded because pile has larger than chosen');
 	} else if (smallerCardsThanChosen.length > 0) {
 		const smallestDiscardId = Math.min(...smallerCardsThanChosen);
 		chosenDiscardIndex = discardsIds.findIndex(
 			(id) => id === smallestDiscardId
 		);
+		console.log('discarded because pile has smaller than chosen');
 	} else {
 		chosenDiscardIndex = Math.floor(Math.random * discardsIds.length - 1);
 	}
