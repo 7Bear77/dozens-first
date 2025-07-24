@@ -438,3 +438,56 @@ main {
 	display: flex;
 	flex-direction: column;
 }
+.dev-panel {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	width: 250px;
+	background-color: #111;
+	color: #eee;
+	border: 2px solid #333;
+	border-radius: 8px;
+	z-index: 10000;
+	font-family: monospace;
+	box-shadow: 0 0 8px #000;
+	user-select: none;
+}
+
+.dev-header {
+	background: #222;
+	cursor: move;
+	padding: 6px 12px;
+	border-bottom: 1px solid #333;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	font-weight: bold;
+}
+
+.dev-body {
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.dev-body select,
+.dev-body input {
+	padding: 2px;
+	background-color: #333;
+	color: #eee;
+	border: 1px solid #444;
+	border-radius: 4px;
+}
+
+.dev-body button {
+	padding: 4px;
+	background-color: #444;
+	color: #eee;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.dev-body button:hover {
+	background-color: #666;
+}

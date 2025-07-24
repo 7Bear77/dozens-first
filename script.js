@@ -847,3 +847,64 @@ document.querySelector('.compturn').addEventListener('click', computerTurn);
 document
 	.querySelector('.discard')
 	.addEventListener('click', determineDiscardCard);
+const devPanel = document.getElementById('dev-panel');
+const header = document.getElementById('dev-header');
+
+header.onmousedown = function (e) {
+	let shiftX = e.clientX - devPanel.getBoundingClientRect().left;
+	let shiftY = e.clientY - devPanel.getBoundingClientRect().top;
+
+	function moveAt(pageX, pageY) {
+		devPanel.style.left = pageX - shiftX + 'px';
+		devPanel.style.top = pageY - shiftY + 'px';
+		devPanel.style.bottom = 'auto';
+		devPanel.style.right = 'auto';
+	}
+
+	function onMouseMove(e) {
+		moveAt(e.pageX, e.pageY);
+	}
+
+	document.addEventListener('mousemove', onMouseMove);
+	document.addEventListener('mouseup', () => {
+		document.removeEventListener('mousemove', onMouseMove);
+	});
+};
+
+document.getElementById('addCard').addEventListener('click', () => {
+	const player = Number(document.getElementById('playerSelect').value);
+	const zone = document.getElementById('zoneSelect').value;
+	const cardId = Number(document.getElementById('cardInput').value);
+
+	if (isNaN(cardId) || cardId < 0 || cardId > 12) return alert('Invalid ID');
+
+	const cardDef = cardObjectDefinitions.find((c) => c.id === cardId);
+	if (!cardDef) return alert('Invalid card');
+
+	const card = { ...cardDef, instanceId: globalCardIdCounter++ };
+
+	const p = gameState.players[player];
+	if (zone === 'hand') p.hand.push(card);
+	else if (zone === 'stock') p.stockPile.push(card);
+	else if (zone.startsWith('discard')) {
+		const dIndex = Number(zone.replace('discard', ''));
+		p.discardPiles[dIndex].push(card);
+	}
+
+	renderAllZones();
+});
+
+document.getElementById('clearZone').addEventListener('click', () => {
+	const player = Number(document.getElementById('playerSelect').value);
+	const zone = document.getElementById('zoneSelect').value;
+
+	const p = gameState.players[player];
+	if (zone === 'hand') p.hand = [];
+	else if (zone === 'stock') p.stockPile = [];
+	else if (zone.startsWith('discard')) {
+		const dIndex = Number(zone.replace('discard', ''));
+		p.discardPiles[dIndex] = [];
+	}
+
+	renderAllZones();
+});
