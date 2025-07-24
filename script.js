@@ -300,6 +300,7 @@ function startGame() {
 	drawCards(gameState.currentPlayerIndex);
 	updateCurrentPlayerIndicator();
 	renderAllZones();
+	setupDevPanel();
 }
 
 function createCards() {
@@ -839,14 +840,6 @@ function determineDiscardCard() {
 	discardCard(playerIndex, chosenCardIndex, chosenDiscardIndex);
 }
 
-document
-	.querySelector('.canplay')
-	.addEventListener('click', computerCanPlayCard);
-
-document.querySelector('.compturn').addEventListener('click', computerTurn);
-document
-	.querySelector('.discard')
-	.addEventListener('click', determineDiscardCard);
 const devPanel = document.getElementById('dev-panel');
 const header = document.getElementById('dev-header');
 
@@ -871,29 +864,6 @@ header.onmousedown = function (e) {
 	});
 };
 
-document.getElementById('addCard').addEventListener('click', () => {
-	const player = Number(document.getElementById('playerSelect').value);
-	const zone = document.getElementById('zoneSelect').value;
-	const cardId = Number(document.getElementById('cardInput').value);
-
-	if (isNaN(cardId) || cardId < 0 || cardId > 12) return alert('Invalid ID');
-
-	const cardDef = cardObjectDefinitions.find((c) => c.id === cardId);
-	if (!cardDef) return alert('Invalid card');
-
-	const card = { ...cardDef, instanceId: globalCardIdCounter++ };
-
-	const p = gameState.players[player];
-	if (zone === 'hand') p.hand.push(card);
-	else if (zone === 'stock') p.stockPile.push(card);
-	else if (zone.startsWith('discard')) {
-		const dIndex = Number(zone.replace('discard', ''));
-		p.discardPiles[dIndex].push(card);
-	}
-
-	renderAllZones();
-});
-
 document.getElementById('clearZone').addEventListener('click', () => {
 	const player = Number(document.getElementById('playerSelect').value);
 	const zone = document.getElementById('zoneSelect').value;
@@ -908,3 +878,64 @@ document.getElementById('clearZone').addEventListener('click', () => {
 
 	renderAllZones();
 });
+function addDevButton(label, handler) {
+	const btn = document.createElement('button');
+	btn.textContent = label;
+	btn.addEventListener('click', handler);
+	document.getElementById('dev-buttons').appendChild(btn);
+}
+
+// Call this once after game is initialized:
+function setupDevButtons() {
+	addDevButton('Copmuter Can Play Card', computerCanPlayCard);
+	addDevButton('Computer Turn', computerTurn);
+	addDevButton('Log State', () => console.log(gameState));
+	// Add more here as needed
+}
+
+function setupDebugTools() {
+	document.getElementById('addCard').addEventListener('click', () => {
+		const player = Number(document.getElementById('playerSelect').value);
+		const zone = document.getElementById('zoneSelect').value;
+		const cardId = Number(document.getElementById('cardInput').value);
+
+		if (isNaN(cardId) || cardId < 0 || cardId > 12)
+			return alert('Invalid ID');
+
+		const cardDef = cardObjectDefinitions.find((c) => c.id === cardId);
+		if (!cardDef) return alert('Card definition not found');
+
+		const card = { ...cardDef, instanceId: globalCardIdCounter++ };
+
+		const p = gameState.players[player];
+		if (zone === 'hand') p.hand.push(card);
+		else if (zone === 'stock') p.stockPile.push(card);
+		else if (zone.startsWith('discard')) {
+			const dIndex = Number(zone.replace('discard', ''));
+			p.discardPiles[dIndex].push(card);
+		}
+
+		renderAllZones();
+	});
+
+	document.getElementById('clearZone').addEventListener('click', () => {
+		const player = Number(document.getElementById('playerSelect').value);
+		const zone = document.getElementById('zoneSelect').value;
+
+		const p = gameState.players[player];
+		if (zone === 'hand') p.hand = [];
+		else if (zone === 'stock') p.stockPile = [];
+		else if (zone.startsWith('discard')) {
+			const dIndex = Number(zone.replace('discard', ''));
+			p.discardPiles[dIndex] = [];
+		}
+
+		renderAllZones();
+	});
+}
+
+function setupDevPanel() {
+	setupDevButtons(); // Adds your dynamic debug buttons
+	setupDebugTools(); // Optional: sets up add/clear card tools if separate
+	document.getElementById('dev-panel').style.display = 'block';
+}

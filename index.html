@@ -88,14 +88,9 @@
 					<div class="stock-pile"></div>
 				</div>
 			</div>
-			<div class="buttons">
-				<button class="canplay">computercanplaycard</button>
-				<button class="compturn">computerturn</button>
-				<button class="discard">determinediscard</button>
-			</div>
 		</main>
 		<div id="dev-panel" class="dev-panel">
-			<div class="dev-header" id="dev-header">🛠 Dev Tools</div>
+			<div class="dev-header" id="dev-header">Dev Tools</div>
 			<div class="dev-body">
 				<label for="playerSelect">Player:</label>
 				<select id="playerSelect">
@@ -113,11 +108,26 @@
 					<option value="discard3">Discard 3</option>
 				</select>
 
-				<label for="cardInput">Card ID (0–12):</label>
-				<input type="number" id="cardInput" min="0" max="12" />
+				<label for="cardInput">Card ID (0 - 12):</label>
+				<select id="cardInput">
+					<option value="0">Wild (0)</option>
+					<option value="1">Card 1</option>
+					<option value="2">Card 2</option>
+					<option value="3">Card 3</option>
+					<option value="4">Card 4</option>
+					<option value="5">Card 5</option>
+					<option value="6">Card 6</option>
+					<option value="7">Card 7</option>
+					<option value="8">Card 8</option>
+					<option value="9">Card 9</option>
+					<option value="10">Card 10</option>
+					<option value="11">Card 11</option>
+					<option value="12">Card 12</option>
+				</select>
 
-				<button id="addCard">➕ Add</button>
-				<button id="clearZone">🧹 Clear</button>
+				<button id="addCard">Add</button>
+				<button id="clearZone">Clear</button>
+				<div id="dev-buttons" class="dev-buttons"></div>
 			</div>
 		</div>
 	</body>

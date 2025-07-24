@@ -451,6 +451,7 @@ main {
 	font-family: monospace;
 	box-shadow: 0 0 8px #000;
 	user-select: none;
+	display: none;
 }
 
 .dev-header {
@@ -490,4 +491,10 @@ main {
 
 .dev-body button:hover {
 	background-color: #666;
+}
+.dev-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-top: 8px;
 }
