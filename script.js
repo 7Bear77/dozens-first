@@ -565,9 +565,7 @@ function extractClass(event) {
 	return (playerIndex = plClass ? Number(plClass.replace('pl', '')) : null);
 }
 
-let playableCards = [];
-
-function computerCanPlayCard(gameVersion) {
+function determinePlayableCards(gameState) {
 	playableCards = [];
 	const playerIndex = gameState.currentPlayerIndex;
 	const player = gameState.players[playerIndex];
@@ -580,18 +578,18 @@ function computerCanPlayCard(gameVersion) {
 	for (let pileIndex = 0; pileIndex < buildPiles.length; pileIndex++) {
 		if (isValidMove(playerStock[stockLengthIndex], buildPiles[pileIndex])) {
 			playableCards.push({
-				cardId: playerStock[stockLengthIndex].id,
 				pileIndex,
 				type: 'stock',
+				card: playerStock[stockLengthIndex],
 			});
 		}
 		for (let cardIndex = 0; cardIndex < playerHand.length; cardIndex++) {
 			if (isValidMove(playerHand[cardIndex], buildPiles[pileIndex])) {
 				playableCards.push({
-					cardId: playerHand[cardIndex].id,
 					pileIndex,
 					type: 'hand',
 					cardIndex,
+					card: playerHand[cardIndex],
 				});
 			}
 		}
@@ -608,22 +606,32 @@ function computerCanPlayCard(gameVersion) {
 				isValidMove(topDiscardCard, buildPiles[pileIndex])
 			) {
 				playableCards.push({
-					cardId: topDiscardCard.id,
 					pileIndex,
 					type: 'discard',
 					discardIndex,
+					card: topDiscardCard,
 				});
 			}
 		}
 	}
-	console.log(playableCards);
-	computerTurn();
+	return playableCards;
 }
 
 // isValidMove(card, buildPile)
-function canReachStock() {
-	let gameStateCopy = gameState;
-	let stockReached = false;
+function canReachStock(
+	gameState,
+	stockReached = false,
+	depth = 0,
+	cardsToPlay = []
+) {
+	if (depth > 2) return cardsToPlay;
+
+	if (depth === 0) {
+		console.log('depth 0 gamestate ', gameState);
+	} else {
+		console.log('depth is ', depth);
+	}
+
 	const playerIndex = gameState.currentPlayerIndex;
 	const player = gameState.players[playerIndex];
 	const playerHand = player.hand;
@@ -634,7 +642,7 @@ function canReachStock() {
 	const topCardofPile = [];
 	const stockCard = playerStock[stockLengthIndex];
 
-	for (let i = 0; i < gameState.buildPiles.length; i++) {
+	for (let i = 0; i < buildPiles.length; i++) {
 		topCardofPile.push(gameState.buildPiles[i].length);
 	}
 
@@ -657,9 +665,10 @@ function canReachStock() {
 			});
 		}
 	}
-	console.log(cardsToReach);
+
 	let easiestIndexToReach;
 	let smallNum = 12;
+
 	for (let i = 0; i < cardsToReach.length; i++) {
 		if (cardsToReach[i].difference < smallNum) {
 			smallNum = cardsToReach[i].difference;
@@ -698,17 +707,58 @@ function canReachStock() {
 		}
 	}
 
-	console.log(cardsNeededToPlayStock);
+	let cardIdsNeededToPlayStock = cardsNeededToPlayStock.map(
+		(item) => item.id
+	);
 
-	let COPY = {
-		player: gameStateCopy.players[gameStateCopy.currentPlayerIndex],
-		playerIndex: gameStateCopy.currentPlayerIndex,
-		playableCards: computerCanPlayCard,
-		topStock:
-			gameStateCopy.players[gameStateCopy.currentPlayerIndex].stockPile
-				.length - 1,
-	};
-	playableTypes = playableCards.map((card) => card.type);
+	function playFromHandOrDiscard() {
+		if (item.type === 'discard') {
+			let tempCardHold =
+				statePlayer.discardPiles[item.discardIndex].pop();
+			stateCopy.buildPiles[easiestIndexToReach].push(tempCardHold);
+		} else if (item.type === 'hand') {
+			let tempCardHold = statePlayer.hand.splice(item.cardIndex, 1);
+			stateCopy.buildPiles[easiestIndexToReach].push(tempCardHold);
+		}
+		console.log('statecopy is ', JSON.parse(JSON.stringify(stateCopy)));
+	}
+
+	const stateCopy = structuredClone(gameState);
+	const statePlayer = stateCopy.players[stateCopy.currentPlayerIndex];
+
+	console.log('statecopy is ', JSON.parse(JSON.stringify(stateCopy)));
+
+	const playableCards = determinePlayableCards(stateCopy);
+	const playableTypes = playableCards.map((card) => card.type);
+
+	if (playableTypes.includes('stock')) {
+		stockReached = true;
+		console.log(cardsToPlay);
+		return;
+	} else {
+		for (item of playableCards) {
+			if (item.pileIndex !== easiestIndexToReach) {
+				break;
+			} else if (item.card.id === Math.min(...cardIdsNeededToPlayStock)) {
+				cardsToPlay.push(item);
+				playFromHandOrDiscard();
+			} else if (item.card.id === 0) {
+				if (
+					!playableCards.some(
+						(item) =>
+							item.card.id ===
+							Math.min(...cardIdsNeededToPlayStock)
+					)
+				) {
+					cardsToPlay.push(item);
+					playFromHandOrDiscard();
+				}
+			} else {
+				console.log('else ', item);
+			}
+		}
+	}
+	canReachStock(stateCopy, stockReached, depth + 1, cardsToPlay);
 }
 
 // function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
@@ -887,8 +937,9 @@ function addDevButton(label, handler) {
 
 // Call this once after game is initialized:
 function setupDevButtons() {
-	addDevButton('Copmuter Can Play Card', computerCanPlayCard);
+	addDevButton('Determine Playable Cards', determinePlayableCards);
 	addDevButton('Computer Turn', computerTurn);
+	addDevButton('Can Reach Stock', () => canReachStock(gameState));
 	addDevButton('Log State', () => console.log(gameState));
 	// Add more here as needed
 }
