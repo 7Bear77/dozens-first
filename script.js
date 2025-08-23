@@ -700,13 +700,18 @@ function canReachStock(
 				if (j === 13) {
 					j = 1;
 				}
-				cardsNeededToPlayStock.push({
-					id: j,
-					index: cardsToReach[easiestIndexToReach].index,
-				});
+				if (j !== stockCard.id) {
+					cardsNeededToPlayStock.push({
+						id: j,
+						index: cardsToReach[easiestIndexToReach].index,
+					});
+				} else if (j === stockCard.id) {
+					j = stockCard.id - 1;
+				}
 			}
 		}
 	}
+	console.log(cardsNeededToPlayStock);
 
 	let cardIdsNeededToPlayStock = cardsNeededToPlayStock.map(
 		(item) => item.id
@@ -792,6 +797,7 @@ function computerTurn() {
 		(depth = 0),
 		(cardsToPlay = [])
 	);
+	console.log(cardsWePlay);
 
 	if (cardsWePlay[cardsWePlay.length - 1] === true) {
 		console.log('we can reach the stockpile');
@@ -800,6 +806,10 @@ function computerTurn() {
 		} else {
 			console.log('play the next card in the queue');
 		}
+	} else if (cardsWePlay[cardsWePlay.length - 1] === false) {
+		console.log(
+			'we cannot reach the stockpile, we should try to empty our hand'
+		);
 	}
 	//  else {
 	// 	determineDiscardCard();
