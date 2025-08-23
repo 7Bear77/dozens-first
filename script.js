@@ -617,19 +617,20 @@ function determinePlayableCards(gameState) {
 	return playableCards;
 }
 
-// isValidMove(card, buildPile)
 function canReachStock(
 	gameState,
 	stockReached = false,
 	depth = 0,
 	cardsToPlay = []
 ) {
-	if (depth > 2) return cardsToPlay;
-
-	if (depth === 0) {
-		console.log('depth 0 gamestate ', gameState);
-	} else {
-		console.log('depth is ', depth);
+	if (depth > 20) {
+		cardsToPlay.push(stockReached);
+		console.log(cardsToPlay);
+		return cardsToPlay;
+	} else if (stockReached === true) {
+		cardsToPlay.push(stockReached);
+		console.log(cardsToPlay);
+		return cardsToPlay;
 	}
 
 	const playerIndex = gameState.currentPlayerIndex;
@@ -732,9 +733,21 @@ function canReachStock(
 	const playableTypes = playableCards.map((card) => card.type);
 
 	if (playableTypes.includes('stock')) {
+		for (item of playableCards) {
+			if (
+				item.type === 'stock' &&
+				item.pileIndex === easiestIndexToReach
+			) {
+				cardsToPlay.push(item);
+			}
+		}
 		stockReached = true;
-		console.log(cardsToPlay);
-		return;
+		cardsToPlay.push(stockReached);
+		console.log(
+			'the stockpile can be played if these cards are played ',
+			cardsToPlay
+		);
+		return cardsToPlay;
 	} else {
 		for (item of playableCards) {
 			if (item.pileIndex !== easiestIndexToReach) {
@@ -758,54 +771,39 @@ function canReachStock(
 			}
 		}
 	}
-	canReachStock(stateCopy, stockReached, depth + 1, cardsToPlay);
+	return canReachStock(stateCopy, stockReached, depth + 1, cardsToPlay);
 }
 
-// function playCard(playerIndex, sourceType, cardSourceIndex, targetPileIndex) {
+// IDEAL COMPUTER TURN
+// computer plays stock if possible ---
+// else computer checks for shortest path to play stock pile ---
+// if such a path exists, execute
+// else play all cards from hand possible
+// discard a card
+// 'hard mode' would include the computer blocking player where possible, and not setting the player up otherwise
+
 function computerTurn() {
 	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-	const canPlayStock = playableCards.findIndex(
-		(stockCard) => stockCard.type == 'stock'
-	);
-	const canPlayHand = playableCards.filter((card) => card.type === 'hand');
-	const canPlayDiscard = playableCards.filter(
-		(card) => card.type === 'discard'
-	);
 	const stockIndex = currentPlayer.stockPile.length - 1;
-	let largestCard = 0;
-	const ids = currentPlayer.hand.map((card) => card.id);
-	ids.forEach((id) => {
-		if (id > largestCard) {
-			largestCard = id;
-		}
-	});
-	const discardIndex = currentPlayer.hand.findIndex(
-		(item) => item.id === largestCard
+
+	const cardsWePlay = canReachStock(
+		gameState,
+		(stockReached = false),
+		(depth = 0),
+		(cardsToPlay = [])
 	);
-	if (canPlayStock !== -1) {
-		playCard(
-			currentPlayer,
-			'stock',
-			stockIndex,
-			playableCards[canPlayStock].pileIndex
-		);
-	} else if (canPlayHand[0]) {
-		playCard(
-			currentPlayer,
-			'hand',
-			canPlayHand[0].cardIndex,
-			canPlayHand[0].pileIndex
-		);
-	} else if (canPlayDiscard[0]) {
-		playCard(
-			currentPlayer,
-			'discard',
-			canPlayDiscard[0].discardIndex,
-			canPlayDiscard[0].pileIndex
-		);
-	} else {
-		determineDiscardCard();
+
+	if (cardsWePlay[cardsWePlay.length - 1] === true) {
+		console.log('we can reach the stockpile');
+		if (cardsWePlay[0].type === 'stock') {
+			console.log('now we play the stock pile');
+		} else {
+			console.log('play the next card in the queue');
+		}
 	}
+	//  else {
+	// 	determineDiscardCard();
+	// }
 }
 
 function determineDiscardCard() {
