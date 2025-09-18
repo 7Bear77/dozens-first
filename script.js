@@ -625,11 +625,11 @@ function canReachStock(
 ) {
 	if (depth > 20) {
 		cardsToPlay.push(stockReached);
-		console.log(cardsToPlay);
+		console.log('cardsToPlay: ', cardsToPlay);
 		return cardsToPlay;
 	} else if (stockReached === true) {
 		cardsToPlay.push(stockReached);
-		console.log(cardsToPlay);
+		console.log('cardsToPlay: ', cardsToPlay);
 		return cardsToPlay;
 	}
 
@@ -711,7 +711,6 @@ function canReachStock(
 			}
 		}
 	}
-	console.log(cardsNeededToPlayStock);
 
 	let cardIdsNeededToPlayStock = cardsNeededToPlayStock.map(
 		(item) => item.id
@@ -724,6 +723,7 @@ function canReachStock(
 			stateCopy.buildPiles[easiestIndexToReach].push(tempCardHold);
 		} else if (item.type === 'hand') {
 			let tempCardHold = statePlayer.hand.splice(item.cardIndex, 1);
+			console.log('tempCardHold: ', tempCardHold);
 			stateCopy.buildPiles[easiestIndexToReach].push(tempCardHold);
 		}
 		console.log('statecopy is ', JSON.parse(JSON.stringify(stateCopy)));
@@ -736,6 +736,7 @@ function canReachStock(
 
 	const playableCards = determinePlayableCards(stateCopy);
 	const playableTypes = playableCards.map((card) => card.type);
+	console.log('playableCards: ', playableCards);
 
 	if (playableTypes.includes('stock')) {
 		for (item of playableCards) {
@@ -748,19 +749,35 @@ function canReachStock(
 		}
 		stockReached = true;
 		cardsToPlay.push(stockReached);
+		cardsToPlay.push(easiestIndexToReach);
 		console.log(
 			'the stockpile can be played if these cards are played ',
 			cardsToPlay
 		);
 		return cardsToPlay;
 	} else {
+		console.log('cardIdsNeededToPlayStock: ', cardIdsNeededToPlayStock);
+		console.log('playableCards: ', playableCards);
 		for (item of playableCards) {
 			if (item.pileIndex !== easiestIndexToReach) {
 				break;
-			} else if (item.card.id === Math.min(...cardIdsNeededToPlayStock)) {
+			} else if (
+				item.card.id === Math.min(...cardIdsNeededToPlayStock) &&
+				stockReached === false
+			) {
+				// will this still work as intended when pile sizes are non 0 to begin? - come back to this, still working on double wild issue
 				cardsToPlay.push(item);
+				console.log('cardsToPlay: ', cardsToPlay);
 				playFromHandOrDiscard();
-			} else if (item.card.id === 0) {
+				if (
+					stateCopy.buildPiles[easiestIndexToReach].length + 1 ===
+					statePlayer.stockPile[statePlayer.stockPile.length - 1].id
+				) {
+					console.log('stock can now be played');
+					cardsToPlay.push(stockCard);
+					stockReached = true;
+				}
+			} else if (item.card.id === 0 && stockReached === false) {
 				if (
 					!playableCards.some(
 						(item) =>
@@ -768,8 +785,18 @@ function canReachStock(
 							Math.min(...cardIdsNeededToPlayStock)
 					)
 				) {
+					console.log('playableCards: ', playableCards);
 					cardsToPlay.push(item);
 					playFromHandOrDiscard();
+					if (
+						stateCopy.buildPiles[easiestIndexToReach].length + 1 ===
+						statePlayer.stockPile[statePlayer.stockPile.length - 1]
+							.id
+					) {
+						console.log('stock can now be played');
+						cardsToPlay.push(stockCard);
+						stockReached = true;
+					}
 				}
 			} else {
 				console.log('else ', item);
@@ -782,14 +809,15 @@ function canReachStock(
 // IDEAL COMPUTER TURN
 // computer plays stock if possible ---
 // else computer checks for shortest path to play stock pile ---
-// if such a path exists, execute
-// else play all cards from hand possible
-// discard a card
+// if such a path exists, execute ---
+// else play all cards from hand possible ---
+// discard a card ---
 // 'hard mode' would include the computer blocking player where possible, and not setting the player up otherwise
 
 function computerTurn() {
 	const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-	const stockIndex = currentPlayer.stockPile.length - 1;
+	const stockIndex =
+		currentPlayer.stockPile[currentPlayer.stockPile.length - 1];
 
 	const cardsWePlay = canReachStock(
 		gameState,
@@ -797,23 +825,28 @@ function computerTurn() {
 		(depth = 0),
 		(cardsToPlay = [])
 	);
-	console.log(cardsWePlay);
+	const pileIndex = cardsToPlay[0].pileIndex;
 
-	if (cardsWePlay[cardsWePlay.length - 1] === true) {
-		console.log('we can reach the stockpile');
-		if (cardsWePlay[0].type === 'stock') {
-			console.log('now we play the stock pile');
-		} else {
-			console.log('play the next card in the queue');
-		}
-	} else if (cardsWePlay[cardsWePlay.length - 1] === false) {
-		console.log(
-			'we cannot reach the stockpile, we should try to empty our hand'
-		);
+	if (cardsToPlay[cardsToPlay.length - 1] === true) {
+		cardsToPlay.forEach((item) => {
+			if (item.type) {
+				playCard(currentPlayer, item.type, item.cardIndex, pileIndex);
+			} else if (item.id) {
+				playCard(currentPlayer, 'stock', stockIndex, pileIndex);
+			}
+		});
+	} else if (cardsToPlay[cardsToPlay.length - 1] === false) {
+		cardsToPlay.forEach((item) => {
+			if (item.type) {
+				playCard(
+					currentPlayer,
+					item.type,
+					item.cardIndex,
+					item.pileIndex
+				);
+			}
+		});
 	}
-	//  else {
-	// 	determineDiscardCard();
-	// }
 }
 
 function determineDiscardCard() {
